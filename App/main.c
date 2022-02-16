@@ -208,8 +208,7 @@ void start_iot_task(void *argument) {
 
     // Configure OpenWeather
     OW_init("<YOUR_OPEN_WEATHER_API_KEY>", <YOUR_LATITUDE>, <YOUR_LONGITUDE>);
-
-
+    
     // Time trackers
     uint32_t read_tick = HAL_GetTick() - WEATHER_READ_PERIOD;
     uint32_t kill_time = 0;
@@ -256,9 +255,6 @@ void start_iot_task(void *argument) {
         osDelay(10);
     }
 }
-
-
-
 
 
 /**
@@ -310,6 +306,11 @@ void format_string(char* out_str, const char* in_str, uint32_t value) {
 }
 
 
+/**
+ * @brief Sleep for a fixed period. Blocks
+ *
+ * @param ms: A sleep period in ms.
+ */
 void sleep_ms(uint32_t ms) {
     uint32_t tick = HAL_GetTick();
     while (true) {

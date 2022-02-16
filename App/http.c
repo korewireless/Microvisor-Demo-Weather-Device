@@ -188,8 +188,11 @@ void http_process_response(void) {
                     double temp = 0.0;
                     char cast[14] = "None";
                     
+                    // Parse the incoming JSON using cJSON
+                    // (https://github.com/DaveGamble/cJSON)
                     cJSON *json = cJSON_Parse((char *)body_buffer);
                     if (json == NULL) {
+                        // Parsing failed -- log an error and bail
                         const char *error_ptr = cJSON_GetErrorPtr();
                         if (error_ptr != NULL) {
                             printf("[ERROR] Cant parse JSON, before %s\n", error_ptr);
@@ -198,88 +201,94 @@ void http_process_response(void) {
                         return;
                     }
                     
+                    // Extract current weather conditions from parsed JSON
                     const cJSON *current = cJSON_GetObjectItemCaseSensitive(json, "current");
                     const cJSON *weather = cJSON_GetObjectItemCaseSensitive(current, "weather");
-                    const cJSON *temp_fl;
+                    const cJSON *feels_like;
                     
-                    cJSON *item = NULL;
-                    cJSON_ArrayForEach(item, weather) {
-                        const cJSON *icon = cJSON_GetObjectItemCaseSensitive(item, "icon");
-                        const cJSON *id = cJSON_GetObjectItemCaseSensitive(item, "id");
-                        const cJSON *main= cJSON_GetObjectItemCaseSensitive(item, "main");
-                        temp_fl = cJSON_GetObjectItemCaseSensitive(item, "feels_like");
-                        
-                        if (cJSON_IsNumber(id)) {
-                            wid = (int)id->valuedouble;
-                        }
-                        
-                        if (cJSON_IsString(main) && (main->valuestring != NULL)) {
-                            strcpy(cast, main->valuestring);
-                        }
-                        
-                        if (strcmp(cast, "Rain") == 0) {
-                            code = RAIN;
-                        } else if (strcmp(cast, "Snow") == 0) {
-                            code = SNOW;
-                        } else if (strcmp(cast, "Thun") == 0) {
-                            code = THUNDERSTORM;
-                        }
-                        
-                        if (wid == 771) {
-                            strcpy(cast, "Windy");
-                            code = WIND;
-                        }
-                        
-                        if (wid == 871) {
-                            strcpy(cast, "Tornado");
-                            code = TORNADO;
-                        }
-                        
-                        if (wid > 699 && wid < 770) {
-                            strcpy(cast, "Foggy");
-                            code = FOG;
-                        }
-                        
-                        if (strcmp(cast, "Clouds") == 0) {
-                            if (wid < 804) {
-                                strcpy(cast, "Partly Cloudy");
-                                code = PARTLY_CLOUDY;
-                            } else {
-                                strcpy(cast, "Cloudy");
-                                code = CLOUDY;
+                    if (weather != NULL) {
+                        cJSON *item = NULL;
+                        cJSON_ArrayForEach(item, weather) {
+                            // Get the info we're interested in
+                            const cJSON *icon = cJSON_GetObjectItemCaseSensitive(item, "icon");
+                            const cJSON *id = cJSON_GetObjectItemCaseSensitive(item, "id");
+                            const cJSON *main= cJSON_GetObjectItemCaseSensitive(item, "main");
+                            feels_like = cJSON_GetObjectItemCaseSensitive(current, "feels_like");
+                            
+                            // Set working values
+                            if (cJSON_IsNumber(id)) wid = (int)id->valuedouble;
+                            if (cJSON_IsString(main) && (main->valuestring != NULL)) {
+                                strcpy(cast, main->valuestring);
                             }
-                        }
-                        
-                        if (wid > 602 && wid < 620) {
-                            strcpy(cast, "Sleet");
-                            code = SLEET;
-                        }
-                        
-                        if (strcmp(cast, "Drizzle") == 0) {
-                            code = DRIZZLE;
-                        }
-                        
-                        if (strcmp(cast, "Clear") == 0) {
-                            if (cJSON_IsString(icon) && (icon->valuestring != NULL)) {
-                                if (icon->valuestring[2] == 'd') {
-                                    code = CLEAR_DAY;
+                            
+                            // Set standard icon values by weather condition
+                            if (strcmp(cast, "Rain") == 0) {
+                                code = RAIN;
+                            } else if (strcmp(cast, "Snow") == 0) {
+                                code = SNOW;
+                            } else if (strcmp(cast, "Thun") == 0) {
+                                code = THUNDERSTORM;
+                            }
+                            
+                            // Update icons and/or condition text for certain
+                            // quirky ID values
+                            if (wid == 771) {
+                                strcpy(cast, "Windy");
+                                code = WIND;
+                            }
+                            
+                            if (wid == 871) {
+                                strcpy(cast, "Tornado");
+                                code = TORNADO;
+                            }
+                            
+                            if (wid > 699 && wid < 770) {
+                                strcpy(cast, "Foggy");
+                                code = FOG;
+                            }
+                            
+                            if (strcmp(cast, "Clouds") == 0) {
+                                if (wid < 804) {
+                                    strcpy(cast, "Partly Cloudy");
+                                    code = PARTLY_CLOUDY;
                                 } else {
-                                    code = CLEAR_NIGHT;
+                                    strcpy(cast, "Cloudy");
+                                    code = CLOUDY;
+                                }
+                            }
+                            
+                            if (wid > 602 && wid < 620) {
+                                strcpy(cast, "Sleet");
+                                code = SLEET;
+                            }
+                            
+                            if (strcmp(cast, "Drizzle") == 0) {
+                                code = DRIZZLE;
+                            }
+                            
+                            if (strcmp(cast, "Clear") == 0) {
+                                if (cJSON_IsString(icon) && (icon->valuestring != NULL)) {
+                                    if (icon->valuestring[2] == 'd') {
+                                        code = CLEAR_DAY;
+                                    } else {
+                                        code = CLEAR_NIGHT;
+                                    }
                                 }
                             }
                         }
                     }
                     
                     if (wid > 0) {
+                        if (cJSON_IsNumber(feels_like)) {
+                            temp = feels_like->valuedouble;
+                        }
+                        
                         sprintf(forecast, "    %s Out: %.1fc    ", cast, temp);
                         icon_code = code;
                         new_forecast = true;
-                        
-                        if (cJSON_IsNumber(temp_fl)) {
-                            temp = temp_fl->valuedouble;
-                        }
                     }
                     
+                    // Free the JSON parser
                     cJSON_Delete(json);
                     printf("[DEBUG] Forecast: %s, %lu\n", cast, code);
                 } else {

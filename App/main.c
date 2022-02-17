@@ -220,7 +220,8 @@ void start_iot_task(void *argument) {
     http_channel_center_setup();
 
     // Configure OpenWeather
-    OW_init("<YOUR_OPEN_WEATHER_API_KEY>", <YOUR_LATITUDE>, <YOUR_LONGITUDE>);
+    // NOTE These values derived from env vars -- see README.md
+    OW_init(API_KEY, LATITUDE, LONGITUDE);
     
     // Time trackers
     uint32_t read_tick = HAL_GetTick() - WEATHER_READ_PERIOD;

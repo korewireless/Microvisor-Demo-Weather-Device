@@ -4,6 +4,24 @@ set(BUILD_NUMBER "1")
 add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
 add_compile_definitions(APP_NAME="Microvisor Weather Demo")
 
+if(DEFINED ENV{MVOW_API_KEY})
+    add_compile_definitions(API_KEY="$ENV{MVOW_API_KEY}")
+else()
+    add_compile_definitions(API_KEY="UNDEFINED")
+endif()
+
+if(DEFINED ENV{MVOW_LAT})
+    add_compile_definitions(LATITUDE=$ENV{MVOW_LAT})
+else()
+    add_compile_definitions(LATITUDE=51.52188334146633)
+endif()
+
+if(DEFINED ENV{MVOW_LNG})
+    add_compile_definitions(LONGITUDE=$ENV{MVOW_LNG})
+else()
+    add_compile_definitions(LONGITUDE=-0.10347583821287779)
+endif()
+
 add_executable(mv-weather-device-demo
     main.c
     cJSON.c

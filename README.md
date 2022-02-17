@@ -27,6 +27,8 @@ You will need a Twilio account. [Sign up now if you don’t have one](https://ww
 
 The demo makes use of the [OpenWeather API](https://openweathermap.org/api/one-call-api). To make use of this API, you will need to [set up an OpenWeather account](https://home.openweathermap.org/users/sign_up) and obtain an API key.
 
+Get your location — or any location co-ordinates — from [Google Maps](https://www.google.co.uk/maps).
+
 You will also need the following hardware:
 
 * A Twilio Microvisor Nucleo Development Board. These are currently only available to Private Beta program participants. You will need to solder male header pins to the two GPIO banks on the board, or at the very least to the connected pins shown in the circuit diagram below.
@@ -46,6 +48,10 @@ This project is written in C. At this time, we only support Ubuntu 20.0.4. Users
 
 **Note** macOS users may attempt to install the pre-requisites below using [Homebrew](https://brew.sh). This is not supported, but should work. You may need to change the names of a few of the packages listed in the `apt install` command below.
 
+### Pre-requisites
+
+#### LIbraries
+
 Under Ubuntu, run the following:
 
 ```bash
@@ -60,6 +66,8 @@ Now run:
 pip3 install cryptography protobuf
 ```
 
+#### Twilio CLI
+
 Install the Twilio CLI (required to view streamed logs):
 
 ```bash
@@ -73,6 +81,8 @@ nvm install --lts
 npm install twilio-cli -g
 twilio plugins:install @twilio/plugin-microvisor
 ```
+
+#### Environment Variables
 
 Running the Twilio CLI and the project's [deploy script](./deploy.sh) — for uploading the built code to the Twilio cloud and subsequent deployment to your Microvisor Nucleo Board — uses the following Twilio credentials stored as environment variables. They should be added to your shell profile:
 
@@ -96,6 +106,16 @@ curl https://microvisor.twilio.com/v1/Devices \
 ```
 
 This will yield JSON which contains a `device` array — your Microvisor Nucleo Board will be in that array. Use the value of its `sid` field for your `MV_DEVICE_SID` value.
+
+#### OpenWeather
+
+Before you build the app, set the following environment variables:
+
+```bash
+export MVOW_API_KEY="<YOUR_OPEN_WEATHER_API_KEY>"
+export MVOW_LAT=<YOUR_LATITUDE_CO-ORDINATE>
+export MVOW_LNG=<YOUR_LONGITUDE_CO-ORDINATE>
+```
 
 ## Build the Application Demo Code
 

@@ -43,8 +43,9 @@ char forecast[32];
 volatile bool       use_i2c = false;
 volatile bool       request_recv = false;
 volatile bool       new_forecast = false;
+volatile bool       is_connected = false;
+volatile bool       net_changed = false;
 volatile uint8_t    icon_code = 12;
-
 
 /**
  * These variables are defined in `http.c`
@@ -73,8 +74,8 @@ int main(void) {
     // Set up the display if it's available
     if (use_i2c) {
         HT16K33_init(2);
-        char* title = malloc(38);
-        sprintf(title, "    %s    ", APP_NAME);
+        char* title = malloc(42);
+        sprintf(title, "    %s %02i    ", APP_NAME, BUILD_NUM);
         HT16K33_print(title, 75);
         free(title);
 
@@ -165,6 +166,18 @@ void start_led_task(void *argument) {
 
     // The task's main loop
     while (true) {
+        // Check connection state
+        if (http_handles.network != 0) {
+            enum MvNetworkStatus net_state = MV_NETWORKSTATUS_DELIBERATELYOFFLINE;
+            uint32_t status = mvGetNetworkStatus(http_handles.network, &net_state);
+            
+            if (status == MV_STATUS_OKAY) {
+                is_connected = (net_state != MV_NETWORKSTATUS_DELIBERATELYOFFLINE);
+            }
+        } else {
+            is_connected = false;
+        }
+        
         // Periodically update the display and flash the USER LED
         uint32_t tick = HAL_GetTick();
         if (tick - last_tick > DEFAULT_TASK_PAUSE) {
@@ -183,7 +196,7 @@ void start_led_task(void *argument) {
 
                 // Draw the weather icon
                 HT16K33_draw_def_char(icon_code);
-                HT16K33_plot(7, 7, (http_handles.channel != 0));
+                HT16K33_plot(7, 7, !is_connected);
                 HT16K33_draw();
             }
         }
@@ -264,45 +277,6 @@ void log_device_info(void) {
     uint8_t buffer[35] = { 0 };
     mvGetDeviceId(buffer, 34);
     printf("Device: %s\n   App: %s\n Build: %i\n", buffer, APP_NAME, BUILD_NUM);
-}
-
-
-/**
- * @brief Log an error message
- *
- * @param msg:   A pointer to a message string containing one long unsigned int marker.
- * @param value: A 32-bit unsigned int to be interpolated into `msg`.
- */
-void log_error(const char* msg, uint32_t value) {
-    char print_str[80] = {0};
-    strcpy(print_str, "[ERROR] ");
-
-    if (strlen(msg) > 61) {
-        char trunc_str[61] = {0};
-        strncpy(trunc_str, msg, 60);
-        sprintf(&print_str[8], trunc_str, value);
-    } else {
-        sprintf(&print_str[8], msg, value);
-    }
-
-    // Output the final string
-    printf(print_str);
-    printf("\n");
-}
-
-
-/**
- * @brief Interpolate a 32-bit unsigned int into a string
- *
- * @param out_str: A pointer to storage for the formatted string. 80 chars max.
- * @param in_str:  A pointer to a message string containing one long unsigned int marker.
- * @param value:   A 32-bit unsigned int to be interpolated into `msg`.
- */
-void format_string(char* out_str, const char* in_str, uint32_t value) {
-    char* base = malloc(80 * sizeof(char));
-    sprintf(base, in_str, value);
-    strcpy(out_str, in_str);
-    free(base);
 }
 
 

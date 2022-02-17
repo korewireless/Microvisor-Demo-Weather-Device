@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(BUILD_NUMBER "1")
 add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
-add_compile_definitions(APP_NAME="Microvisor Weather Device Demo")
+add_compile_definitions(APP_NAME="Microvisor Weather Demo")
 
 add_executable(mv-weather-device-demo
     main.c

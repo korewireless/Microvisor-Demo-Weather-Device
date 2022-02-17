@@ -79,8 +79,6 @@ void        start_led_task(void *argument);
 void        start_iot_task(void *argument);
 
 void        log_device_info(void);
-void        log_error(const char* msg, uint32_t value);
-void        format_string(char* out_str, const char* in_str, uint32_t value);
 void        sleep_ms(uint32_t ms);
 
 

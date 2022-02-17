@@ -27,6 +27,7 @@ extern volatile bool        new_forecast;
 extern volatile uint32_t    icon_code;
 extern          char        forecast[32];
 
+
 /**
  *  @brief Open a new HTTP channel.
  */
@@ -40,7 +41,7 @@ void http_open_channel(void) {
     // NOTE This is set in `logging.c` which puts the network in place
     //      (ie. so the network handle != 0) well in advance of this being called
     http_handles.network = get_net_handle();
-    assert((http_handles.network != 0) && "[ERROR] Network handle not non-zero");
+    assert(http_handles.network != 0 && "[ERROR] Network handle not non-zero");
     printf("[DEBUG] Network handle: %lu\n", (uint32_t)http_handles.network);
 
     // Configure the required data channel
@@ -64,10 +65,10 @@ void http_open_channel(void) {
     // and confirm that it has accepted the request
     uint32_t status = mvOpenChannel(&channel_config, &http_handles.channel);
     if (status == MV_STATUS_OKAY) {
+        assert(http_handles.channel != 0 && "[ERROR] Channel handle not non-zero");
         printf("[DEBUG] HTTP channel open. Handle: %lu\n", (uint32_t)http_handles.channel);
-        assert((http_handles.channel != 0) && "[ERROR] Channel handle not non-zero");
     } else {
-        log_error("HTTP channel closed. Status: %lu", status);
+        printf("[ERROR] HTTP channel closed. Status: %lu", status);
     }
 }
 
@@ -81,12 +82,12 @@ void http_close_channel(void) {
     // the closure request.
     if (http_handles.channel != 0) {
         uint32_t status = mvCloseChannel(&http_handles.channel);
-        printf("[DEBUG] HTTP channel closed\n");
         assert((status == MV_STATUS_OKAY || status == MV_STATUS_CHANNELCLOSED) && "[ERROR] Channel closure");
+        printf("[DEBUG] HTTP channel closed\n");
     }
 
     // Confirm the channel handle has been invalidated by Microvisor
-    assert((http_handles.channel == 0) && "[ERROR] Channel handle not zero");
+    assert(http_handles.channel == 0 && "[ERROR] Channel handle not zero");
 }
 
 
@@ -107,12 +108,12 @@ void http_channel_center_setup(void) {
     // Ask Microvisor to establish the notification center
     // and confirm that it has accepted the request
     uint32_t status = mvSetupNotifications(&http_notification_setup, &http_handles.notification);
-    assert((status == MV_STATUS_OKAY) && "[ERROR] Could not set up HTTP channel NC");
-
+    assert(status == MV_STATUS_OKAY && "[ERROR] Could not set up HTTP channel NC");
+    printf("[DEBUG] Notification center handle: %lu\n", (uint32_t)http_handles.notification);
+    
     // Start the notification IRQ
     NVIC_ClearPendingIRQ(TIM8_BRK_IRQn);
     NVIC_EnableIRQ(TIM8_BRK_IRQn);
-    printf("[DEBUG] Notification center handle: %lu\n", (uint32_t)http_handles.notification);
 }
 
 
@@ -125,7 +126,6 @@ bool http_send_request(const char* url) {
     // Check for a valid channel handle
     if (http_handles.channel != 0) {
         printf("[DEBUG] Sending HTTP request\n");
-        printf("[DEBUG] URL: %s\n", url);
         
         // Set up the request
         const char verb[] = "GET";
@@ -151,7 +151,7 @@ bool http_send_request(const char* url) {
         }
 
         // Report send failure
-        log_error("Could not issue request. Status: %lu", status);
+        printf("[ERROR] Could not issue request. Status: %lu", status);
         return false;
     }
 

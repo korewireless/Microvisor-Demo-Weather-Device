@@ -278,7 +278,10 @@ void http_process_response(void) {
                         }
                     }
                     
+                    // Did we get updated wetaher info?
                     if (wid > 0) {
+                        // Yes! So update the forecast string, and tell the main loop
+                        // to refresh the display
                         if (cJSON_IsNumber(feels_like)) {
                             temp = feels_like->valuedouble;
                         }
@@ -290,7 +293,7 @@ void http_process_response(void) {
                     
                     // Free the JSON parser
                     cJSON_Delete(json);
-                    printf("[DEBUG] Forecast: %s, %lu\n", cast, code);
+                    printf("[DEBUG] Forecast: %s (code: %lu) Feels Like %.1fc\n", cast, code, temp);
                 } else {
                     printf("[ERROR] HTTP response body read status %lu\n", status);
                 }

@@ -75,8 +75,8 @@ extern "C" {
  */
 void        system_clock_config(void);
 void        GPIO_init(void);
-void        start_led_task(void *argument);
-void        start_iot_task(void *argument);
+void        start_led_task(void *unused_arg);
+void        start_iot_task(void *unused_arg);
 
 void        log_device_info(void);
 void        sleep_ms(uint32_t ms);

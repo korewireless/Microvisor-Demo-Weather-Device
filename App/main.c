@@ -159,9 +159,9 @@ void GPIO_init(void) {
 /**
   * @brief Function implementing the display task thread.
   *
-  * @param argument: Not used.
+  * @param *unused_arg: Not used.
   */
-void start_led_task(void *argument) {
+void start_led_task(void *unused_arg) {
     uint32_t last_tick = 0;
 
     // The task's main loop
@@ -210,9 +210,9 @@ void start_led_task(void *argument) {
 /**
   * @brief Function implementing the Debug Task thread.
   *
-  * @param argument: Not used.
+  * @param *unused_arg: Not used.
   */
-void start_iot_task(void *argument) {
+void start_iot_task(void *unused_arg) {
     // Get the Device ID and build number
     log_device_info();
 

@@ -49,6 +49,7 @@ add_custom_command(OUTPUT EXTRAS
     COMMAND python3 ../../twilio-microvisor-tools/bundler-py/bundler.py mv-weather-device-demo.elf mv-weather-device-demo.zip
     COMMAND rm -f ../../null.d
     COMMAND echo "LATEST BUILD: ${BUILD_NUMBER}"
+    COMMAND echo "  OW API KEY: $ENV{MVOW_API_KEY}"
 )
 
 add_custom_target(extras ALL

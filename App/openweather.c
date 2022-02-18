@@ -9,7 +9,7 @@
 #include "main.h"
 
 
-char request_url[160] = { 0 };
+char request_url[165] = { 0 };
 
 
 /**
@@ -19,7 +19,7 @@ char request_url[160] = { 0 };
  */
 void OW_init(const char* api_key, double lat, double lng) {
     // Create the access URL using sprintf()
-    sprintf(request_url, "%s?lat=%.6f&lon=%.6f&appid=%s&exclude=minutely,hourly,daily&units=metric", FORECAST_BASE_URL, lat, lng, api_key);
+    sprintf(request_url, "%s?lat=%.6f&lon=%.6f&appid=%s&exclude=minutely,hourly,daily,alerts&units=metric", FORECAST_BASE_URL, lat, lng, api_key);
 }
 
 

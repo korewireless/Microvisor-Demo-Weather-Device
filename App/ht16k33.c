@@ -113,7 +113,7 @@ const char CHARSET[128][6] = {
 };
 
 // User-defined chars store
-uint8_t def_chars[13][8];
+uint8_t def_chars[32][8];
 
 // Display buffer
 uint8_t display_buffer[8];
@@ -135,6 +135,9 @@ void HT16K33_init(uint8_t angle) {
             display_angle = angle;
         }
     }
+    
+    // Zero the user-define character store
+    memset((void *)def_chars, 0x00, 256);
 }
 
 
@@ -205,15 +208,11 @@ void HT16K33_draw(void) {
  */
 void HT16K33_plot(uint8_t x, uint8_t y, bool is_set) {
     // Set or unset the specified pixel
-    uint8_t col = display_buffer[x];
-
     if (is_set) {
-        col |= (1 << y);
+        display_buffer[x] |= (1 << y);
     } else {
-        col &= ~(1 << y);
+        display_buffer[x] &= ~(1 << y);
     }
-
-    display_buffer[x] = col;
 }
 
 
@@ -280,7 +279,7 @@ void HT16K33_print(const char *text, uint32_t delay_ms) {
  *  @param code: The character code (0-32) of the user-defined character.
  */
 void HT16K33_draw_def_char(uint8_t code) {
-    if (code > 12) code = 12;
+    assert(code < 32);
     for (uint8_t i = 0 ; i < 8 ; ++i) display_buffer[i] = def_chars[code][i];
 }
 
@@ -292,7 +291,7 @@ void HT16K33_draw_def_char(uint8_t code) {
  *  @param code:   The character code (0-32) of the user-defined character.
  */
 void HT16K33_define_character(const char* sprite, uint8_t code) {
-    if (code > 12) return;
+    assert(code < 32);
     memcpy(def_chars[code], sprite, 8);
 }
 

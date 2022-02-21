@@ -167,15 +167,14 @@ void start_led_task(void *unused_arg) {
     // The task's main loop
     while (true) {
         // Check connection state
+        is_connected = false;
         if (http_handles.network != 0) {
             enum MvNetworkStatus net_state = MV_NETWORKSTATUS_DELIBERATELYOFFLINE;
             uint32_t status = mvGetNetworkStatus(http_handles.network, &net_state);
             
             if (status == MV_STATUS_OKAY) {
-                is_connected = (net_state != MV_NETWORKSTATUS_DELIBERATELYOFFLINE);
+                is_connected = (net_state == MV_NETWORKSTATUS_CONNECTED);
             }
-        } else {
-            is_connected = false;
         }
         
         // Periodically update the display and flash the USER LED

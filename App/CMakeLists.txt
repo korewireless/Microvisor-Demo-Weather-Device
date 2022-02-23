@@ -1,9 +1,18 @@
 cmake_minimum_required(VERSION 3.14)
 
+# Set application data
+set(APP "Microvisor Weather Demo")
+set(VERSION_NUMBER "1.0.0")
 set(BUILD_NUMBER "1")
-add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
-add_compile_definitions(APP_NAME="Microvisor Weather Demo")
 
+message("Building ${APP} ${VERSION_NUMBER} build ${BUILD_NUMBER}")
+
+# Make app data available to the compiler
+add_compile_definitions(APP_NAME="${APP}")
+add_compile_definitions(APP_VERSION="${VERSION_NUMBER}")
+add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
+
+# Load in and use project env vars
 if(DEFINED ENV{MVOW_API_KEY})
     add_compile_definitions(API_KEY="$ENV{MVOW_API_KEY}")
 else()
@@ -22,7 +31,8 @@ else()
     add_compile_definitions(LONGITUDE=-0.10347583821287779)
 endif()
 
-add_executable(mv-weather-device-demo
+# Compile app source code file(s)
+add_executable(${PROJECT_NAME}
     main.c
     cJSON.c
     ht16k33.c
@@ -33,7 +43,8 @@ add_executable(mv-weather-device-demo
     stm32u5xx_hal_timebase_tim_template.c
 )
 
-target_link_libraries(mv-weather-device-demo LINK_PUBLIC
+# Link built libraries
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC
     ST_Code
     twilio-microvisor-hal-stm32u5
     FreeRTOS)
@@ -41,18 +52,13 @@ target_link_libraries(mv-weather-device-demo LINK_PUBLIC
 # Optional informational and additional format generation
 # including Bundle output
 add_custom_command(OUTPUT EXTRAS
-    DEPENDS mv-weather-device-demo
-    COMMAND cp "mv-weather-device-demo" "mv-weather-device-demo.elf"
-    COMMAND ${CMAKE_SIZE} --format=berkeley "mv-weather-device-demo"
-    COMMAND ${CMAKE_OBJDUMP} -h -S "mv-weather-device-demo.elf" > "mv-weather-device-demo.list"
-    COMMAND ${CMAKE_OBJCOPY} -O binary "mv-weather-device-demo.elf" "mv-weather-device-demo.bin"
-    COMMAND python3 ../../twilio-microvisor-tools/bundler-py/bundler.py mv-weather-device-demo.elf mv-weather-device-demo.zip
+    DEPENDS ${PROJECT_NAME}
+    COMMAND cp "${PROJECT_NAME}" "${PROJECT_NAME}.elf"
+    COMMAND ${CMAKE_SIZE} --format=berkeley "${PROJECT_NAME}"
+    COMMAND ${CMAKE_OBJDUMP} -h -S "${PROJECT_NAME}.elf" > "${PROJECT_NAME}.list"
+    COMMAND ${CMAKE_OBJCOPY} -O binary "${PROJECT_NAME}.elf" "${PROJECT_NAME}.bin"
+    COMMAND python3 ../../twilio-microvisor-tools/bundler-py/bundler.py "${PROJECT_NAME}.elf" "${PROJECT_NAME}.zip"
     COMMAND rm -f ../../null.d
-    COMMAND echo "LATEST BUILD: ${BUILD_NUMBER}"
-    COMMAND echo "  OW API KEY: $ENV{MVOW_API_KEY}"
 )
 
-add_custom_target(extras ALL
-    ${CMAKE_COMMAND} -E echo "Outputting additional artefacts"
-    DEPENDS EXTRAS
-)
+add_custom_target(extras ALL DEPENDS EXTRAS)

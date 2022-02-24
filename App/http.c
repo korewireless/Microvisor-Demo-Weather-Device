@@ -63,12 +63,12 @@ void http_open_channel(void) {
 
     // Ask Microvisor to open the channel
     // and confirm that it has accepted the request
-    uint32_t status = mvOpenChannel(&channel_config, &http_handles.channel);
+    enum MvStatus status = mvOpenChannel(&channel_config, &http_handles.channel);
     if (status == MV_STATUS_OKAY) {
         assert(http_handles.channel != 0 && "[ERROR] Channel handle not non-zero");
         printf("[DEBUG] HTTP channel open. Handle: %lu\n", (uint32_t)http_handles.channel);
     } else {
-        printf("[ERROR] HTTP channel closed. Status: %lu", status);
+        printf("[ERROR] HTTP channel closed. Status: %i", status);
     }
 }
 
@@ -81,7 +81,7 @@ void http_close_channel(void) {
     // then ask Microvisor to close it and confirm acceptance of
     // the closure request.
     if (http_handles.channel != 0) {
-        uint32_t status = mvCloseChannel(&http_handles.channel);
+        enum MvStatus status = mvCloseChannel(&http_handles.channel);
         assert((status == MV_STATUS_OKAY || status == MV_STATUS_CHANNELCLOSED) && "[ERROR] Channel closure");
         printf("[DEBUG] HTTP channel closed\n");
     }
@@ -107,7 +107,7 @@ void http_channel_center_setup(void) {
 
     // Ask Microvisor to establish the notification center
     // and confirm that it has accepted the request
-    uint32_t status = mvSetupNotifications(&http_notification_setup, &http_handles.notification);
+    enum MvStatus status = mvSetupNotifications(&http_notification_setup, &http_handles.notification);
     assert(status == MV_STATUS_OKAY && "[ERROR] Could not set up HTTP channel NC");
     printf("[DEBUG] Notification center handle: %lu\n", (uint32_t)http_handles.notification);
     
@@ -144,14 +144,14 @@ bool http_send_request(const char* url) {
         };
 
         // Issue the request -- and check its status
-        uint32_t status = mvSendHttpRequest(http_handles.channel, &request_config);
+        enum MvStatus status = mvSendHttpRequest(http_handles.channel, &request_config);
         if (status == MV_STATUS_OKAY) {
             printf("[DEBUG] Request sent to Twilio\n");
             return true;
         }
 
         // Report send failure
-        printf("[ERROR] Could not issue request. Status: %lu", status);
+        printf("[ERROR] Could not issue request. Status: %i", status);
         return false;
     }
 
@@ -169,7 +169,7 @@ void http_process_response(void) {
     // We have received data via the active HTTP channel so establish
     // an `MvHttpResponseData` record to hold response metadata
     struct MvHttpResponseData resp_data;
-    uint32_t status = mvReadHttpResponseData(http_handles.channel, &resp_data);
+    enum MvStatus status = mvReadHttpResponseData(http_handles.channel, &resp_data);
     if (status == MV_STATUS_OKAY) {
         // Check we successfully issued the request (`result` is OK) and
         // the request was successful (status code 200)
@@ -295,7 +295,7 @@ void http_process_response(void) {
                     cJSON_Delete(json);
                     printf("[DEBUG] Forecast: %s (code: %lu) Feels Like %.1fc\n", cast, code, temp);
                 } else {
-                    printf("[ERROR] HTTP response body read status %lu\n", status);
+                    printf("[ERROR] HTTP response body read status %i\n", status);
                 }
             } else {
                 printf("[ERROR] HTTP status code: %lu\n", resp_data.status_code);
@@ -304,7 +304,7 @@ void http_process_response(void) {
             printf("[ERROR] Request failed. Status: %lu\n", (uint32_t)resp_data.result);
         }
     } else {
-        printf("[ERROR] Response data read failed. Status: %lu\n", status);
+        printf("[ERROR] Response data read failed. Status: %i\n", status);
     }
 }
 

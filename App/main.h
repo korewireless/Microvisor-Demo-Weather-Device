@@ -44,16 +44,15 @@ extern "C" {
  */
 #define     LED_GPIO_BANK           GPIOA
 #define     LED_GPIO_PIN            GPIO_PIN_5
-#define     LED_FLASH_PERIOD        1000
 
 #define     BUTTON_GPIO_BANK        GPIOF
 #define     BUTTON_GPIO_PIN         GPIO_PIN_6
 
-#define     DEBUG_TASK_PAUSE        1000
-#define     DEFAULT_TASK_PAUSE      500
+#define     DEBUG_TASK_PAUSE_MS     1000
+#define     DEFAULT_TASK_PAUSE_MS   500
 
-#define     WEATHER_READ_PERIOD     300000
-#define     CHANNEL_KILL_PERIOD     15000
+#define     WEATHER_READ_PERIOD_MS  300000
+#define     CHANNEL_KILL_PERIOD_MS  15000
 
 #define     CLEAR_DAY               0
 #define     RAIN                    1

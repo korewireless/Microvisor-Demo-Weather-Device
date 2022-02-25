@@ -75,7 +75,7 @@ int main(void) {
     if (use_i2c) {
         HT16K33_init(2);
         char* title = malloc(42);
-        sprintf(title, "    %s %02i    ", APP_NAME, BUILD_NUM);
+        sprintf(title, "    %s %s (%02i)    ", APP_NAME, APP_VERSION, BUILD_NUM);
         HT16K33_print(title, 75);
         free(title);
 
@@ -179,7 +179,7 @@ void start_led_task(void *unused_arg) {
         
         // Periodically update the display and flash the USER LED
         uint32_t tick = HAL_GetTick();
-        if (tick - last_tick > DEFAULT_TASK_PAUSE) {
+        if (tick - last_tick > DEFAULT_TASK_PAUSE_MS) {
             last_tick = tick;
             HAL_GPIO_TogglePin(LED_GPIO_BANK, LED_GPIO_PIN);
 
@@ -223,14 +223,14 @@ void start_iot_task(void *unused_arg) {
     OW_init(API_KEY, LATITUDE, LONGITUDE);
     
     // Time trackers
-    uint32_t read_tick = HAL_GetTick() - WEATHER_READ_PERIOD;
+    uint32_t read_tick = HAL_GetTick() - WEATHER_READ_PERIOD_MS;
     uint32_t kill_time = 0;
     bool close_channel = false;
 
     // Run the thread's main loop
     while (true) {
         uint32_t tick = HAL_GetTick();
-        if (tick - read_tick > WEATHER_READ_PERIOD) {
+        if (tick - read_tick > WEATHER_READ_PERIOD_MS) {
             read_tick = tick;
 
             // No channel open? Try and send the temperature
@@ -251,7 +251,7 @@ void start_iot_task(void *unused_arg) {
 
         // Use 'kill_time' to force-close an open HTTP channel
         // if it's been left open too long
-        if (kill_time > 0 && tick - kill_time > CHANNEL_KILL_PERIOD) {
+        if (kill_time > 0 && tick - kill_time > CHANNEL_KILL_PERIOD_MS) {
             close_channel = true;
         }
 

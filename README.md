@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo
+# Twilio Microvisor Weather Device Demo 1.0.0
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -33,6 +33,7 @@ You will also need the following hardware:
 
 * A Twilio Microvisor Nucleo Development Board. These are currently only available to Private Beta program participants. You will need to solder male header pins to the two GPIO banks on the board, or at the very least to the connected pins shown in the circuit diagram below.
 * An HT16K33-based 8x8 matrix display, e.g., [Adafruit 1.2-inch 8x8 LED Matrix and Backpack](https://www.adafruit.com/product/1856).
+* Four female-to-female jumper wires.
 
 ## Hardware Setup
 

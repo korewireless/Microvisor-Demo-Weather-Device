@@ -30,18 +30,20 @@ extern          char        forecast[32];
 
 /**
  *  @brief Open a new HTTP channel.
+ *
+ *  @retval `true` if the channel is open, otherwise `false`.
  */
-void http_open_channel(void) {
+bool http_open_channel(void) {
     // Set up the HTTP channel's multi-use send and receive buffers
-    static volatile uint8_t http_rx_buffer[HTTP_RX_BUFFER_SIZE] __attribute__((aligned(512)));
-    static volatile uint8_t http_tx_buffer[HTTP_TX_BUFFER_SIZE] __attribute__((aligned(512)));
+    static volatile uint8_t http_rx_buffer[HTTP_RX_BUFFER_SIZE_B] __attribute__((aligned(512)));
+    static volatile uint8_t http_tx_buffer[HTTP_TX_BUFFER_SIZE_B] __attribute__((aligned(512)));
     static const char endpoint[] = "";
 
     // Get the network channel handle.
     // NOTE This is set in `logging.c` which puts the network in place
     //      (ie. so the network handle != 0) well in advance of this being called
     http_handles.network = get_net_handle();
-    assert(http_handles.network != 0 && "[ERROR] Network handle not non-zero");
+    if (http_handles.network == 0) return false;
     printf("[DEBUG] Network handle: %lu\n", (uint32_t)http_handles.network);
 
     // Configure the required data channel
@@ -65,11 +67,13 @@ void http_open_channel(void) {
     // and confirm that it has accepted the request
     enum MvStatus status = mvOpenChannel(&channel_config, &http_handles.channel);
     if (status == MV_STATUS_OKAY) {
-        assert(http_handles.channel != 0 && "[ERROR] Channel handle not non-zero");
         printf("[DEBUG] HTTP channel open. Handle: %lu\n", (uint32_t)http_handles.channel);
+        return true;
     } else {
         printf("[ERROR] HTTP channel closed. Status: %i", status);
     }
+    
+    return false;
 }
 
 
@@ -109,11 +113,11 @@ void http_channel_center_setup(void) {
     // and confirm that it has accepted the request
     enum MvStatus status = mvSetupNotifications(&http_notification_setup, &http_handles.notification);
     assert(status == MV_STATUS_OKAY && "[ERROR] Could not set up HTTP channel NC");
-    printf("[DEBUG] Notification center handle: %lu\n", (uint32_t)http_handles.notification);
     
     // Start the notification IRQ
     NVIC_ClearPendingIRQ(TIM8_BRK_IRQn);
     NVIC_EnableIRQ(TIM8_BRK_IRQn);
+    printf("[DEBUG] Notification center handle: %lu\n", (uint32_t)http_handles.notification);
 }
 
 
@@ -301,7 +305,7 @@ void http_process_response(void) {
                 printf("[ERROR] HTTP status code: %lu\n", resp_data.status_code);
             }
         } else {
-            printf("[ERROR] Request failed. Status: %lu\n", (uint32_t)resp_data.result);
+            printf("[ERROR] Request failed. Status: %i\n", resp_data.result);
         }
     } else {
         printf("[ERROR] Response data read failed. Status: %i\n", status);

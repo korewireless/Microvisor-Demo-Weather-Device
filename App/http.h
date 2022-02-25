@@ -13,15 +13,15 @@
 /*
  * CONSTANTS
  */
-#define     HTTP_RX_BUFFER_SIZE         2560
-#define     HTTP_TX_BUFFER_SIZE         512
+#define     HTTP_RX_BUFFER_SIZE_B       2560
+#define     HTTP_TX_BUFFER_SIZE_B       512
 
 
 /*
  * PROTOTYPES
  */
 void        http_channel_center_setup(void);
-void        http_open_channel(void);
+bool        http_open_channel(void);
 void        http_close_channel(void);
 bool        http_send_request(const char* url);
 void        http_process_response(void);

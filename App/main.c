@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.0.1
+ * Version 1.0.2
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -114,10 +114,10 @@ int main(void) {
 
 
 /**
-  * @brief Get the MV clock value.
-  *
-  * @returns The clock value.
-  */
+ * @brief Get the MV clock value.
+ *
+ * @retval The clock value.
+ */
 uint32_t SECURE_SystemCoreClockUpdate() {
     uint32_t clock = 0;
     mvGetHClk(&clock);
@@ -126,8 +126,8 @@ uint32_t SECURE_SystemCoreClockUpdate() {
 
 
 /**
-  * @brief System clock configuration.
-  */
+ * @brief System clock configuration.
+ */
 void system_clock_config(void) {
     SystemCoreClockUpdate();
     HAL_InitTick(TICK_INT_PRIORITY);
@@ -135,10 +135,10 @@ void system_clock_config(void) {
 
 
 /**
-  * @brief Initialize the MCU GPIO
-  *
-  * Used to flash the Nucleo's USER LED, which is on GPIO Pin PA5.
-  */
+ * @brief Initialize the MCU GPIO
+ *
+ * Used to flash the Nucleo's USER LED, which is on GPIO Pin PA5.
+ */
 void GPIO_init(void) {
     // Enable GPIO port clock
     __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -157,10 +157,10 @@ void GPIO_init(void) {
 
 
 /**
-  * @brief Function implementing the display task thread.
-  *
-  * @param *unused_arg: Not used.
-  */
+ * @brief Function implementing the display task thread.
+ *
+ * @param *unused_arg: Not used.
+ */
 void start_led_task(void *unused_arg) {
     uint32_t last_tick = 0;
 
@@ -207,10 +207,10 @@ void start_led_task(void *unused_arg) {
 
 
 /**
-  * @brief Function implementing the Debug Task thread.
-  *
-  * @param *unused_arg: Not used.
-  */
+ * @brief Function implementing the Debug Task thread.
+ *
+ * @param *unused_arg: Not used.
+ */
 void start_iot_task(void *unused_arg) {
     // Get the Device ID and build number
     log_device_info();

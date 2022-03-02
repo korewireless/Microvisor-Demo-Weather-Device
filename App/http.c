@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.0.1
+ * Version 1.0.2
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -124,7 +124,7 @@ void http_channel_center_setup(void) {
 /**
  * @brief Send a stock HTTP request.
  *
- * @returns `true` if the request was accepted by Microvisor, otherwise `false`
+ * @retval `true` if the request was accepted by Microvisor, otherwise `false`
  */
 bool http_send_request(const char* url) {
     // Check for a valid channel handle
@@ -314,10 +314,10 @@ void http_process_response(void) {
 
 
 /**
- *  @brief The HTTP channel notification interrupt handler.
+ * @brief The HTTP channel notification interrupt handler.
  *
- *  This is called by Microvisor -- we need to check for key events
- *  and extract HTTP response data when it is available.
+ * This is called by Microvisor -- we need to check for key events
+ * and extract HTTP response data when it is available.
  */
 void TIM8_BRK_IRQHandler(void) {
     // Get the event type

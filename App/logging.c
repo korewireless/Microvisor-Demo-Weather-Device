@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.0.1
+ * Version 1.0.2
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -112,6 +112,7 @@ void log_close_channel(void) {
  *
  * @brief Wire up the `stdio` system call, so that `printf()`
  *        works as a logging message generator.
+ * 
  * @param  file    The log entry -- a C string -- to send.
  * @param  ptr     A pointer to the C string we want to send.
  * @param  length  The length of the message.

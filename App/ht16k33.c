@@ -12,7 +12,7 @@
 // Defined in `main.c`
 extern I2C_HandleTypeDef i2c;
 
-// The Ascii chracter set
+// The Ascii character set
 const char CHARSET[128][6] = {
     "\x00\x00\x00",              // space - Ascii 32
     "\xfa\x00",                  // !
@@ -129,13 +129,13 @@ void HT16K33_init(uint8_t angle) {
     HT16K33_write_cmd(HT16K33_CMD_DISPLAY_ON);      // Display on
     HT16K33_set_brightness(2);                      // Set brightness
     HT16K33_clear_buffer();
-    
+
     if (angle != 0) {
         if (angle > 0 && angle < 4) {
             display_angle = angle;
         }
     }
-    
+
     // Zero the user-define character store
     memset((void *)def_chars, 0x00, 256);
 }
@@ -182,18 +182,18 @@ void HT16K33_draw(void) {
     // Set up the buffer holding the data to be
     // transmitted to the LED
     uint8_t tx_buffer[17] = { 0 };
-    
+
     if (display_angle != 0) {
         HT16K33_rotate(display_angle);
     }
-    
+
     // Span the 8 bytes of the graphics buffer
     // across the 16 bytes of the LED's buffer
     for (uint8_t i = 0 ; i < 8 ; ++i) {
         uint8_t a = display_buffer[i];
         tx_buffer[i * 2 + 1] = (a >> 1) + ((a << 7) & 0xFF);
     }
-    
+
     // Display the buffer and flash the LED
     HAL_I2C_Master_Transmit(&i2c, HT16K33_I2C_ADDR << 1, tx_buffer, sizeof(tx_buffer), 100);
 }
@@ -300,7 +300,7 @@ void HT16K33_rotate(uint8_t angle) {
     uint8_t temp[8] = { 0 };
     uint8_t a = 0;
     uint8_t line_value = 0;
-    
+
     for (int32_t y = 0 ; y < 8 ; ++y) {
         line_value = display_buffer[y];
         for (int32_t x = 7 ; x > -1 ; x--) {
@@ -316,7 +316,7 @@ void HT16K33_rotate(uint8_t angle) {
             }
         }
     }
-    
+
     // Swap the matrices
     memcpy(display_buffer, temp, 8);
 }

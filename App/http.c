@@ -72,7 +72,7 @@ bool http_open_channel(void) {
     } else {
         printf("[ERROR] HTTP channel closed. Status: %i", status);
     }
-    
+
     return false;
 }
 
@@ -113,7 +113,7 @@ void http_channel_center_setup(void) {
     // and confirm that it has accepted the request
     enum MvStatus status = mvSetupNotifications(&http_notification_setup, &http_handles.notification);
     assert(status == MV_STATUS_OKAY && "[ERROR] Could not set up HTTP channel NC");
-    
+
     // Start the notification IRQ
     NVIC_ClearPendingIRQ(TIM8_BRK_IRQn);
     NVIC_EnableIRQ(TIM8_BRK_IRQn);
@@ -130,7 +130,7 @@ bool http_send_request(const char* url) {
     // Check for a valid channel handle
     if (http_handles.channel != 0) {
         printf("[DEBUG] Sending HTTP request\n");
-        
+
         // Set up the request
         const char verb[] = "GET";
         const char body[] = "";
@@ -180,7 +180,7 @@ void http_process_response(void) {
         if (resp_data.result == MV_HTTPRESULT_OK) {
             if (resp_data.status_code == 200) {
                 printf("[DEBUG] HTTP response body length: %lu\n", resp_data.body_length);
-                
+
                 // Set up a buffer that we'll get Microvisor
                 // to write the response body into
                 static uint8_t body_buffer[1500];
@@ -191,7 +191,7 @@ void http_process_response(void) {
                     uint32_t code = NONE;
                     double temp = 0.0;
                     char cast[14] = "None";
-                    
+
                     // Parse the incoming JSON using cJSON
                     // (https://github.com/DaveGamble/cJSON)
                     cJSON *json = cJSON_Parse((char *)body_buffer);
@@ -204,12 +204,12 @@ void http_process_response(void) {
                         cJSON_Delete(json);
                         return;
                     }
-                    
+
                     // Extract current weather conditions from parsed JSON
                     const cJSON *current = cJSON_GetObjectItemCaseSensitive(json, "current");
                     const cJSON *weather = cJSON_GetObjectItemCaseSensitive(current, "weather");
                     const cJSON *feels_like;
-                    
+
                     if (weather != NULL) {
                         cJSON *item = NULL;
                         cJSON_ArrayForEach(item, weather) {
@@ -218,13 +218,13 @@ void http_process_response(void) {
                             const cJSON *id = cJSON_GetObjectItemCaseSensitive(item, "id");
                             const cJSON *main= cJSON_GetObjectItemCaseSensitive(item, "main");
                             feels_like = cJSON_GetObjectItemCaseSensitive(current, "feels_like");
-                            
+
                             // Set working values
                             if (cJSON_IsNumber(id)) wid = (int)id->valuedouble;
                             if (cJSON_IsString(main) && (main->valuestring != NULL)) {
                                 strcpy(cast, main->valuestring);
                             }
-                            
+
                             // Set standard icon values by weather condition
                             if (strcmp(cast, "Rain") == 0) {
                                 code = RAIN;
@@ -233,24 +233,24 @@ void http_process_response(void) {
                             } else if (strcmp(cast, "Thun") == 0) {
                                 code = THUNDERSTORM;
                             }
-                            
+
                             // Update icons and/or condition text for certain
                             // quirky ID values
                             if (wid == 771) {
                                 strcpy(cast, "Windy");
                                 code = WIND;
                             }
-                            
+
                             if (wid == 871) {
                                 strcpy(cast, "Tornado");
                                 code = TORNADO;
                             }
-                            
+
                             if (wid > 699 && wid < 770) {
                                 strcpy(cast, "Foggy");
                                 code = FOG;
                             }
-                            
+
                             if (strcmp(cast, "Clouds") == 0) {
                                 if (wid < 804) {
                                     strcpy(cast, "Partly Cloudy");
@@ -260,16 +260,16 @@ void http_process_response(void) {
                                     code = CLOUDY;
                                 }
                             }
-                            
+
                             if (wid > 602 && wid < 620) {
                                 strcpy(cast, "Sleet");
                                 code = SLEET;
                             }
-                            
+
                             if (strcmp(cast, "Drizzle") == 0) {
                                 code = DRIZZLE;
                             }
-                            
+
                             if (strcmp(cast, "Clear") == 0) {
                                 if (cJSON_IsString(icon) && (icon->valuestring != NULL)) {
                                     if (icon->valuestring[2] == 'd') {
@@ -281,20 +281,20 @@ void http_process_response(void) {
                             }
                         }
                     }
-                    
-                    // Did we get updated wetaher info?
+
+                    // Did we get updated weather info?
                     if (wid > 0) {
                         // Yes! So update the forecast string, and tell the main loop
                         // to refresh the display
                         if (cJSON_IsNumber(feels_like)) {
                             temp = feels_like->valuedouble;
                         }
-                        
+
                         sprintf(forecast, "    %s Out: %.1fc    ", cast, temp);
                         icon_code = code;
                         new_forecast = true;
                     }
-                    
+
                     // Free the JSON parser
                     cJSON_Delete(json);
                     printf("[DEBUG] Forecast: %s (code: %lu) Feels Like %.1fc\n", cast, code, temp);

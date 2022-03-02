@@ -32,11 +32,11 @@ extern volatile bool net_changed;
 void log_open_channel(void) {
     // Configure the logging notification center
     log_channel_center_setup();
-    
+
     // Connect to the network
     // NOTE This connection spans logging and HTTP comms
     log_open_network();
-    
+
     // Configure and open the logging channel
     static volatile uint8_t receive_buffer[16];
     static volatile uint8_t send_buffer[512] __attribute__((aligned(512)));
@@ -56,7 +56,7 @@ void log_open_channel(void) {
             .endpoint_len = strlen(endpoint)
         }
     };
-    
+
     enum MvStatus status = mvOpenChannel(&channel_config, &log_handles.channel);
     assert(status == MV_STATUS_OKAY);
 }
@@ -112,7 +112,7 @@ void log_close_channel(void) {
  *
  * @brief Wire up the `stdio` system call, so that `printf()`
  *        works as a logging message generator.
- * 
+ *
  * @param  file    The log entry -- a C string -- to send.
  * @param  ptr     A pointer to the C string we want to send.
  * @param  length  The length of the message.
@@ -153,14 +153,14 @@ void log_channel_center_setup() {
     if (log_handles.notification == 0) {
         // Clear the notification store
         memset((void *)log_notification_buffer, 0xff, sizeof(log_notification_buffer));
-        
+
         // Configure a notification center for network-centric notifications
         static struct MvNotificationSetup log_notification_config = {
             .irq = TIM1_BRK_IRQn,
             .buffer = (struct MvNotification *)log_notification_buffer,
             .buffer_size = sizeof(log_notification_buffer)
         };
-        
+
         // Ask Microvisor to establish the notification center
         // and confirm that it has accepted the request
         enum MvStatus status = mvSetupNotifications(&log_notification_config, &log_handles.notification);
@@ -227,9 +227,9 @@ MvNetworkHandle get_net_handle() {
 void TIM1_BRK_IRQHandler(void) {
     // Get the event type
     enum MvEventType event_kind = log_notification_buffer->event_type;
-    
+
     if (event_kind == MV_EVENTTYPE_NETWORKSTATUSCHANGED) {
-        // Flag we need to check for a possible network disconnectio
+        // Flag we need to check for a possible network disconnection
         net_changed = true;
     }
 }

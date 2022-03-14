@@ -33,7 +33,7 @@ const osThreadAttr_t iot_task_attributes = {
 
 // I2C-related values
 I2C_HandleTypeDef i2c;
-char forecast[32];
+char forecast[32] = "None";
 
 /**
  *  Theses variables may be changed by interrupt handler code,

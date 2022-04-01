@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo 1.0.2
+# Twilio Microvisor Weather Device Demo 1.0.3
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -21,6 +21,12 @@ and then:
 ```bash
 cd microvisor-weather-device-demo
 git submodule update --init --recursive
+```
+
+To subsequently update the submodules to their most recent commits, run:
+
+```bash
+git submodule update --remote --recursive
 ```
 
 ## Requirements

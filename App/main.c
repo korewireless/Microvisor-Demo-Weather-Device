@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.0.2
+ * Version 1.0.3
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -171,12 +171,12 @@ void start_led_task(void *unused_arg) {
         if (http_handles.network != 0) {
             enum MvNetworkStatus net_state = MV_NETWORKSTATUS_DELIBERATELYOFFLINE;
             enum MvStatus status = mvGetNetworkStatus(http_handles.network, &net_state);
-            
+
             if (status == MV_STATUS_OKAY) {
                 is_connected = (net_state == MV_NETWORKSTATUS_CONNECTED);
             }
         }
-        
+
         // Periodically update the display and flash the USER LED
         uint32_t tick = HAL_GetTick();
         if (tick - last_tick > DEFAULT_TASK_PAUSE_MS) {
@@ -221,7 +221,7 @@ void start_iot_task(void *unused_arg) {
     // Configure OpenWeather
     // NOTE These values derived from env vars -- see README.md
     OW_init(API_KEY, LATITUDE, LONGITUDE);
-    
+
     // Time trackers
     uint32_t read_tick = HAL_GetTick() - WEATHER_READ_PERIOD_MS;
     uint32_t kill_time = 0;

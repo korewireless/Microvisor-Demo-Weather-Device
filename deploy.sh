@@ -13,6 +13,7 @@
 
 # GLOBALS
 do_log=0
+do_build=1
 do_deploy=1
 zip_path="./build/App/mv-weather-device-demo.zip"
 
@@ -22,7 +23,8 @@ show_help() {
     echo -e "  deploy [-l] [-h] /optional/path/to/Microvisor/app/bunde.zip\n"
     echo -e "Options:\n"
     echo "  -l / --log      After deployment, start log streaming. Default: no logging"
-    echo "  -k              Start log streaming immediately; do not deploy"
+    echo "  -k              Start log streaming immediately; do not build or deploy"
+    echo "  -d              Deploy without a build"
     echo "  -h / --help     Show this help screen"
     echo
 }
@@ -30,6 +32,17 @@ show_help() {
 stream_log() {
     echo "Logging from ${MV_DEVICE_SID}..."
     twilio microvisor:logs:stream "${MV_DEVICE_SID}"
+}
+
+build_app() {
+    echo "Building app..."
+    cmake --build build > /dev/null
+    if [[ $? -eq 0 ]]; then
+        echo "App built"
+    else
+        echo "[ERROR] Could not build the app... exiting"
+        exit 1
+    fi
 }
 
 # RUNTIME START
@@ -40,6 +53,9 @@ for arg in "$@"; do
     elif [[ "$check_arg" = "-k" ]]; then
         do_log=1
         do_deploy=0
+        do_build=0
+    elif [[ "$check_arg" = "-d" ]]; then
+        do_build=0
     elif [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
         show_help
         exit 0
@@ -47,6 +63,10 @@ for arg in "$@"; do
         zip_path="$arg"
     fi
 done
+
+if [[ $do_build -eq 1 ]]; then
+    build_app
+fi
 
 if [[ $do_deploy -eq 1 ]]; then
     # Check we have what looks like a bundle

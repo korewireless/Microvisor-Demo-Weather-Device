@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo 1.0.3
+# Twilio Microvisor Weather Device Demo 1.1.0
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -28,6 +28,20 @@ To subsequently update the submodules to their most recent commits, run:
 ```bash
 git submodule update --remote --recursive
 ```
+
+## Remote debugging
+
+This release supports remote debugging. Builds are enabled for remote debugging automatically. Change the value of the line
+
+```
+set(ENABLE_REMOTE 1)
+```
+
+in the root `CMakeLists.txt` file to `0` to disable this.
+
+Enabling remote debugging in the build does not initiate a GDB session — you will have to do this manually. Follow the instructions in the [Microvisor documentation](https://www.twilio.com/docs/iot/microvisor/microvisor-remote-debugging) **Private Beta participants only**
+
+**Note** The file `app/CMakeLists.txt` generates new remote debugging keys at each build. These are placed in the `/build/app` directory, which is ignored for git commits.
 
 ## Requirements
 
@@ -59,14 +73,14 @@ This project is written in C. At this time, we only support Ubuntu 20.0.4. Users
 
 ### Pre-requisites
 
-#### LIbraries
+#### Libraries
 
 Under Ubuntu, run the following:
 
 ```bash
 sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi git \
                  python3 python3-pip build-essential protobuf-compiler \
-                 cmake libsecret-1-dev curl jq
+                 cmake libsecret-1-dev curl jq openssl
 ```
 
 Now run:

@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo 1.2.0
+# Twilio Microvisor Weather Device Demo 1.2.1
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -36,7 +36,7 @@ git submodule update --remote --recursive
 This release supports remote debugging. Builds are enabled for remote debugging automatically. Change the value of the line
 
 ```
-set(ENABLE_REMOTE 1)
+set(ENABLE_REMOTE_DEBUGGING 1)
 ```
 
 in the root `CMakeLists.txt` file to `0` to disable this.

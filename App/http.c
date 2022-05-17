@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.2.0
+ * Version 1.2.1
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -44,7 +44,7 @@ bool http_open_channel(void) {
     //      (ie. so the network handle != 0) well in advance of this being called
     http_handles.network = get_net_handle();
     if (http_handles.network == 0) return false;
-    printf("[DEBUG] Network handle: %lu\n", (uint32_t)http_handles.network);
+    server_log("Network handle: %lu", (uint32_t)http_handles.network);
 
     // Configure the required data channel
     struct MvOpenChannelParams channel_config = {
@@ -67,10 +67,10 @@ bool http_open_channel(void) {
     // and confirm that it has accepted the request
     enum MvStatus status = mvOpenChannel(&channel_config, &http_handles.channel);
     if (status == MV_STATUS_OKAY) {
-        printf("[DEBUG] HTTP channel open. Handle: %lu\n", (uint32_t)http_handles.channel);
+        server_log("HTTP channel open. Handle: %lu", (uint32_t)http_handles.channel);
         return true;
     } else {
-        printf("[ERROR] HTTP channel closed. Status: %i", status);
+        server_error("HTTP channel closed. Status: %i", status);
     }
 
     return false;
@@ -87,7 +87,7 @@ void http_close_channel(void) {
     if (http_handles.channel != 0) {
         enum MvStatus status = mvCloseChannel(&http_handles.channel);
         assert((status == MV_STATUS_OKAY || status == MV_STATUS_CHANNELCLOSED) && "[ERROR] Channel closure");
-        printf("[DEBUG] HTTP channel closed\n");
+        server_log("HTTP channel closed");
     }
 
     // Confirm the channel handle has been invalidated by Microvisor
@@ -117,7 +117,7 @@ void http_channel_center_setup(void) {
     // Start the notification IRQ
     NVIC_ClearPendingIRQ(TIM8_BRK_IRQn);
     NVIC_EnableIRQ(TIM8_BRK_IRQn);
-    printf("[DEBUG] Notification center handle: %lu\n", (uint32_t)http_handles.notification);
+    server_log("Notification center handle: %lu", (uint32_t)http_handles.notification);
 }
 
 
@@ -129,7 +129,7 @@ void http_channel_center_setup(void) {
 bool http_send_request(const char* url) {
     // Check for a valid channel handle
     if (http_handles.channel != 0) {
-        printf("[DEBUG] Sending HTTP request\n");
+        server_log("Sending HTTP request");
 
         // Set up the request
         const char verb[] = "GET";
@@ -150,12 +150,12 @@ bool http_send_request(const char* url) {
         // Issue the request -- and check its status
         enum MvStatus status = mvSendHttpRequest(http_handles.channel, &request_config);
         if (status == MV_STATUS_OKAY) {
-            printf("[DEBUG] Request sent to Twilio\n");
+            server_log("Request sent to Twilio");
             return true;
         }
 
         // Report send failure
-        printf("[ERROR] Could not issue request. Status: %i", status);
+        server_error("Could not issue request. Status: %i", status);
         return false;
     }
 
@@ -179,7 +179,7 @@ void http_process_response(void) {
         // the request was successful (status code 200)
         if (resp_data.result == MV_HTTPRESULT_OK) {
             if (resp_data.status_code == 200) {
-                printf("[DEBUG] HTTP response body length: %lu\n", resp_data.body_length);
+                server_log("HTTP response body length: %lu", resp_data.body_length);
 
                 // Set up a buffer that we'll get Microvisor
                 // to write the response body into
@@ -199,7 +199,7 @@ void http_process_response(void) {
                         // Parsing failed -- log an error and bail
                         const char *error_ptr = cJSON_GetErrorPtr();
                         if (error_ptr != NULL) {
-                            printf("[ERROR] Cant parse JSON, before %s\n", error_ptr);
+                            server_error("Cant parse JSON, before %s", error_ptr);
                         }
                         cJSON_Delete(json);
                         return;
@@ -297,18 +297,18 @@ void http_process_response(void) {
 
                     // Free the JSON parser
                     cJSON_Delete(json);
-                    printf("[DEBUG] Forecast: %s (code: %lu) Feels Like %.1fc\n", cast, code, temp);
+                    server_log("Forecast: %s (code: %lu) Feels Like %.1fc", cast, code, temp);
                 } else {
-                    printf("[ERROR] HTTP response body read status %i\n", status);
+                    server_error("HTTP response body read status %i", status);
                 }
             } else {
-                printf("[ERROR] HTTP status code: %lu\n", resp_data.status_code);
+                server_error("HTTP status code: %lu", resp_data.status_code);
             }
         } else {
-            printf("[ERROR] Request failed. Status: %i\n", resp_data.result);
+            server_error("Request failed. Status: %i", resp_data.result);
         }
     } else {
-        printf("[ERROR] Response data read failed. Status: %i\n", status);
+        server_error("Response data read failed. Status: %i", status);
     }
 }
 
@@ -322,7 +322,6 @@ void http_process_response(void) {
 void TIM8_BRK_IRQHandler(void) {
     // Get the event type
     enum MvEventType event_kind = http_notification_center->event_type;
-    printf("[DEBUG] Channel notification center IRQ called for event: %u\n", event_kind);
 
     if (event_kind == MV_EVENTTYPE_CHANNELDATAREADABLE) {
         // Flag we need to access received data and to close the HTTP channel

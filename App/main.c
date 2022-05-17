@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.2.0
+ * Version 1.2.1
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -18,7 +18,7 @@
 osThreadId_t LEDTask;
 const osThreadAttr_t led_task_attributes = {
     .name = "LEDTask",
-    .stack_size = 1024,
+    .stack_size = 2048,
     .priority = (osPriority_t) osPriorityNormal
 };
 
@@ -27,7 +27,7 @@ const osThreadAttr_t led_task_attributes = {
 osThreadId_t IOTTask;
 const osThreadAttr_t iot_task_attributes = {
     .name = "IOTTask",
-    .stack_size = 1536,
+    .stack_size = 4096,
     .priority = (osPriority_t) osPriorityNormal
 };
 
@@ -240,7 +240,7 @@ void start_iot_task(void *unused_arg) {
                 if (!result) close_channel = true;
                 kill_time = tick;
             } else {
-                printf("[ERROR] Channel handle not zero\n");
+                server_error("Channel handle not zero");
             }
         }
 
@@ -290,4 +290,38 @@ void sleep_ms(uint32_t ms) {
     while (true) {
         if (HAL_GetTick() - tick > ms) break;
     }
+}
+
+
+/**
+ * @brief Issue debug message.
+ *
+ * @param format_string Message string with optional formatting
+ * @param ...           Optional injectable values
+ */
+void server_log(char* format_string, ...) {
+    if (LOG_DEBUG_MESSAGES) {
+        va_list args;
+        char buffer[1024] = "[DEBUG] ";
+        va_start(args, format_string);
+        vsprintf(&buffer[8], format_string, args);
+        va_end(args);
+        printf("%s\n", buffer);
+    }
+}
+
+
+/**
+ * @brief Issue error message.
+ *
+ * @param format_string Message string with optional formatting
+ * @param ...           Optional injectable values
+ */
+void server_error(char* format_string, ...) {
+    va_list args;
+    char buffer[1024] = "[ERROR] ";
+    va_start(args, format_string);
+    vsprintf(&buffer[8], format_string, args);
+    va_end(args);
+    printf("%s\n", buffer);
 }

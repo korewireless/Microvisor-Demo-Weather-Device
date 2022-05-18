@@ -37,7 +37,6 @@ stream_log() {
 }
 
 build_app() {
-    echo "Building app..."
     if [[ ! -d ./build ]]; then
         cmake -S . -B build
     fi

@@ -62,14 +62,12 @@ add_custom_command(OUTPUT EXTRA_FILES
 add_custom_command(OUTPUT REMOTE_DEBUG
     DEPENDS ${PROJECT_NAME}
     COMMAND python3 "${CMAKE_SOURCE_DIR}/twilio-microvisor-tools/bundler-py/bundler.py" "${PROJECT_NAME}.elf" --debug-auth-pubkey debug_auth_pub_key.pem "${PROJECT_NAME}.zip"
-    COMMAND rm -f ${CMAKE_SOURCE_DIR}/null.d
 )
 
 # Bundle without remote debugging key
 add_custom_command(OUTPUT NO_REMOTE_DEBUG
     DEPENDS ${PROJECT_NAME}
     COMMAND python3 "${CMAKE_SOURCE_DIR}/twilio-microvisor-tools/bundler-py/bundler.py" "${PROJECT_NAME}.elf" "${PROJECT_NAME}.zip"
-    COMMAND rm -f ${CMAKE_SOURCE_DIR}/null.d
 )
 
 # Generate remote debugging auth keys

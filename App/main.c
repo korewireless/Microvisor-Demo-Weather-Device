@@ -302,7 +302,7 @@ void sleep_ms(uint32_t ms) {
 void server_log(char* format_string, ...) {
     if (LOG_DEBUG_MESSAGES) {
         va_list args;
-        char buffer[1024] = "[DEBUG] ";
+        char buffer[512] = "[DEBUG] ";
         va_start(args, format_string);
         vsprintf(&buffer[8], format_string, args);
         va_end(args);
@@ -319,7 +319,7 @@ void server_log(char* format_string, ...) {
  */
 void server_error(char* format_string, ...) {
     va_list args;
-    char buffer[1024] = "[ERROR] ";
+    char buffer[512] = "[ERROR] ";
     va_start(args, format_string);
     vsprintf(&buffer[8], format_string, args);
     va_end(args);

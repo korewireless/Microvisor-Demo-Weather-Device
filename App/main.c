@@ -107,7 +107,7 @@ int main(void) {
 
     // We should never get here as control is now taken by the scheduler,
     // but just in case...
-    while (true) {
+    while (1) {
         // NOP
     }
 }
@@ -165,7 +165,7 @@ void start_led_task(void *unused_arg) {
     uint32_t last_tick = 0;
 
     // The task's main loop
-    while (true) {
+    while (1) {
         // Check connection state
         is_connected = false;
         if (http_handles.network != 0) {
@@ -228,7 +228,7 @@ void start_iot_task(void *unused_arg) {
     bool close_channel = false;
 
     // Run the thread's main loop
-    while (true) {
+    while (1) {
         uint32_t tick = HAL_GetTick();
         if (tick - read_tick > WEATHER_READ_PERIOD_MS) {
             read_tick = tick;
@@ -287,7 +287,7 @@ void log_device_info(void) {
  */
 void sleep_ms(uint32_t ms) {
     uint32_t tick = HAL_GetTick();
-    while (true) {
+    while (1) {
         if (HAL_GetTick() - tick > ms) break;
     }
 }

@@ -258,7 +258,7 @@ void HT16K33_print(const char *text, uint32_t delay_ms) {
     // Finally, animate the line by repeatedly sending 8 columns
     // of the output buffer to the matrix
     uint cursor = 0;
-    while (true) {
+    while (1) {
         uint a = cursor;
         for (uint8_t i = 0 ; i < 8 ; ++i) {
             display_buffer[i] = src_buffer[a];

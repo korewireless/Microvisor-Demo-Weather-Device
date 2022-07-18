@@ -34,7 +34,7 @@
 #include "i2c.h"
 #include "http.h"
 #include "openweather.h"
-#include "cJson.h"
+#include "cJSON.h"
 
 
 #ifdef __cplusplus

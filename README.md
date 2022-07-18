@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo 1.3.3
+# Twilio Microvisor Weather Device Demo 1.3.4
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -74,7 +74,7 @@ sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi git \
 Now run:
 
 ```bash
-pip3 install cryptography protobuf
+pip3 install cryptography protobuf~=3.0
 ```
 
 #### Twilio CLI

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 # Set application data
 set(APP "Microvisor Weather Demo")
-set(VERSION_NUMBER "1.3.3")
+set(VERSION_NUMBER "1.3.4")
 set(BUILD_NUMBER "0")
 
 message("Building ${APP} ${VERSION_NUMBER} build ${BUILD_NUMBER}")
@@ -93,10 +93,10 @@ if(NOT OPENSSL)
 endif()
 
 # Based on build setting (see project CMakeLists.txt),
-# select which addtional command sets to run
+# select which additional command sets to run
 if(DEFINED ENABLE_REMOTE_DEBUGGING AND ${ENABLE_REMOTE_DEBUGGING} EQUAL 1)
     message("Bundling ${APP} for remote debugging")
-    
+
     # Don't generate keys if a public key has been passed in
     # via the deploy script --public-key option
     if(DEFINED NO_KEY_GEN AND ${NO_KEY_GEN} EQUAL 1)
@@ -108,4 +108,3 @@ else()
     message("Bundling ${APP}")
     add_custom_target(extras ALL DEPENDS EXTRA_FILES NO_REMOTE_DEBUG)
 endif()
-

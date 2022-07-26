@@ -163,7 +163,7 @@ void GPIO_init(void) {
  */
 void start_led_task(void *unused_arg) {
     uint32_t last_tick = 0;
-    bool conn_state = false;
+    bool connection_pixel_state = false;
 
     // The task's main loop
     while (1) {
@@ -193,14 +193,16 @@ void start_led_task(void *unused_arg) {
                     sleep_ms(1500);
                     new_forecast = false;
                 }
-
-                // Draw the weather icon
+                
+                // Set the top right pixel to flash when
+                // the device is disconnected.
                 if (!is_connected) {
-                    conn_state = !conn_state;
+                    connection_pixel_state = !connection_pixel_state;
                 } else {
-                    conn_state = false;
+                    connection_pixel_state = false;
                 }
                 
+                // Draw the weather icon
                 HT16K33_draw_def_char(icon_code);
                 HT16K33_plot(7, 7, conn_state);
                 HT16K33_draw();

@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.3.4
+ * Version 1.3.5
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -163,6 +163,7 @@ void GPIO_init(void) {
  */
 void start_led_task(void *unused_arg) {
     uint32_t last_tick = 0;
+    bool conn_state = false;
 
     // The task's main loop
     while (1) {
@@ -194,8 +195,14 @@ void start_led_task(void *unused_arg) {
                 }
 
                 // Draw the weather icon
+                if (!is_connected) {
+                    conn_state = !conn_state;
+                } else {
+                    conn_state = false;
+                }
+                
                 HT16K33_draw_def_char(icon_code);
-                HT16K33_plot(7, 7, !is_connected);
+                HT16K33_plot(7, 7, conn_state);
                 HT16K33_draw();
             }
         }

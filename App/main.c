@@ -204,7 +204,7 @@ void start_led_task(void *unused_arg) {
                 
                 // Draw the weather icon
                 HT16K33_draw_def_char(icon_code);
-                HT16K33_plot(7, 7, conn_state);
+                HT16K33_plot(7, 7, connection_pixel_state);
                 HT16K33_draw();
             }
         }

@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.3.5
+ * Version 2.0.0
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -285,7 +285,7 @@ void start_iot_task(void *unused_arg) {
 void log_device_info(void) {
     uint8_t buffer[35] = { 0 };
     mvGetDeviceId(buffer, 34);
-    printf("Device: %s\n   App: %s\n Build: %i\n", buffer, APP_NAME, BUILD_NUM);
+    server_log("Device: %s\n   App: %s\n Build: %i", buffer, APP_NAME, BUILD_NUM);
 }
 
 
@@ -299,38 +299,4 @@ void sleep_ms(uint32_t ms) {
     while (1) {
         if (HAL_GetTick() - tick > ms) break;
     }
-}
-
-
-/**
- * @brief Issue debug message.
- *
- * @param format_string Message string with optional formatting
- * @param ...           Optional injectable values
- */
-void server_log(char* format_string, ...) {
-    if (LOG_DEBUG_MESSAGES) {
-        va_list args;
-        char buffer[512] = "[DEBUG] ";
-        va_start(args, format_string);
-        vsprintf(&buffer[8], format_string, args);
-        va_end(args);
-        printf("%s\n", buffer);
-    }
-}
-
-
-/**
- * @brief Issue error message.
- *
- * @param format_string Message string with optional formatting
- * @param ...           Optional injectable values
- */
-void server_error(char* format_string, ...) {
-    va_list args;
-    char buffer[512] = "[ERROR] ";
-    va_start(args, format_string);
-    vsprintf(&buffer[8], format_string, args);
-    va_end(args);
-    printf("%s\n", buffer);
 }

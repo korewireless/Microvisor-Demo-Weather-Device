@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 1.3.5
+ * Version 2.0.0
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -81,8 +81,6 @@ void        start_led_task(void *unused_arg);
 void        start_iot_task(void *unused_arg);
 
 void        log_device_info(void);
-void        server_log(char* format_string, ...);
-void        server_error(char* format_string, ...);
 void        sleep_ms(uint32_t ms);
 
 

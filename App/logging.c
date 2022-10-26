@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
-  * Version 2.0.4
+ * Version 2.0.4
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -9,6 +9,18 @@
 #include "main.h"
 
 
+/*
+ * STATIC PROTOTYPES
+ */
+static void net_open_network(void);
+static void net_notification_center_setup(void);
+static void log_start(void);
+static void log_service_setup(void);
+
+
+/*
+ * GLOBALS
+ */
 // Central store for Microvisor resource handles used in this code.
 // See 'https://www.twilio.com/docs/iot/microvisor/syscalls#handles'
 struct {
@@ -19,7 +31,7 @@ struct {
 
 // Central store for network management notification records.
 // Holds four records at a time -- each record is 16 bytes in size.
-static volatile struct MvNotification net_notification_buffer[4];
+static volatile struct MvNotification net_notification_buffer[4] __attribute__((aligned(8)));
 
 const uint32_t log_buffer_size = 4096;
 static uint8_t log_buffer[4096] __attribute__((aligned(512))) = {0} ;
@@ -31,10 +43,10 @@ static uint8_t log_buffer[4096] __attribute__((aligned(512))) = {0} ;
  * Open a data channel for Microvisor logging.
  * This call will also request a network connection.
  */
-void log_start(void) {
+static void log_start(void) {
     // Initiate the Microvisor logging service
     log_service_setup();
-    
+
     // Connect to the network
     // NOTE This connection spans logging and HTTP comms
     net_open_network();
@@ -44,10 +56,10 @@ void log_start(void) {
 /**
  * @brief Configure and connect to the network.
  */
-void net_open_network() {
+static void net_open_network() {
     // Configure the network's notification center
     net_notification_center_setup();
-    
+
     if (net_handles.network == 0) {
         // Configure the network connection request
         struct MvRequestNetworkParams network_config = {
@@ -87,7 +99,7 @@ void net_open_network() {
 /**
  * @brief Configure the network Notification Center.
  */
-void net_notification_center_setup() {
+static void net_notification_center_setup() {
     if (net_handles.notification == 0) {
         // Clear the notification store
         memset((void *)net_notification_buffer, 0xff, sizeof(net_notification_buffer));
@@ -114,11 +126,11 @@ void net_notification_center_setup() {
 /**
  * @brief Initiate Microvisor application logging.
  */
-void log_service_setup(void) {
+static void log_service_setup(void) {
     if (net_handles.log == 0) {
         // Initialse logging with the standard system call
         enum MvStatus status = mvServerLoggingInit(log_buffer, log_buffer_size);
-        
+
         // Set a mock handle as a proxy for a 'logging enabled' flag
         if (status == MV_STATUS_OKAY) net_handles.log = USER_HANDLE_LOGGING_STARTED;
         assert(status == MV_STATUS_OKAY);
@@ -166,7 +178,7 @@ void server_error(char* format_string, ...) {
 void do_log(bool is_err, char* format_string, va_list args) {
     if (get_net_handle() == 0) log_start();
     char buffer[1024] = {0};
-    
+
     // Add a timestamp
     // NO LONG REQUIRED WITH MV PLUGIN 0.3.3 :-(
     /*
@@ -180,24 +192,24 @@ void do_log(bool is_err, char* format_string, va_list args) {
         sec = (time_t)usec / 1000000;
         msec = (time_t)usec / 1000;
     }
-    
+
     // Write time string as "2022-05-10 13:30:58.XXX "
     strftime(timestamp, 64, "%F %T.XXX ", gmtime(&sec));
 
     // Insert the millisecond time over the XXX
     sprintf(&timestamp[20], "%03u", (unsigned)(msec % 1000));
-    
+
     // Write the timestamp to the message
     strcpy(buffer, timestamp);
     size_t len = strlen(timestamp);
     */
-    
+
     // Write the message type to the message
     sprintf(buffer, is_err ? "[ERROR] " : "[DEBUG] ");
-    
+
     // Write the formatted text to the message
     vsnprintf(&buffer[8], sizeof(buffer) - 9, format_string, args);
-    
+
     // Output the message using the system call
     mvServerLog((const uint8_t*)buffer, (uint16_t)strlen(buffer));
 }

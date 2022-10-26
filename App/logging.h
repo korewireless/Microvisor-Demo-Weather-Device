@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
-  * Version 2.0.4
+ * Version 2.0.4
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -28,12 +28,6 @@ extern "C" {
 /*
  * PROTOTYPES
  */
-void            log_start(void);
-void            log_service_setup(void);
-
-void            net_open_network(void);
-void            net_notification_center_setup(void);
-
 MvNetworkHandle get_net_handle(void);
 uint32_t        get_log_handle(void);
 

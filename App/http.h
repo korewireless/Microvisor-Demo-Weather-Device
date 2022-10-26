@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
-  * Version 2.0.4
+ * Version 2.0.4
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -15,6 +15,7 @@
  */
 #define     HTTP_RX_BUFFER_SIZE_B       2560
 #define     HTTP_TX_BUFFER_SIZE_B       512
+#define     HTTP_NT_BUFFER_SIZE_R       8
 
 
 /*

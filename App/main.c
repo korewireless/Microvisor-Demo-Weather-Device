@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
-  * Version 2.0.4
+ * Version 2.0.4
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -9,7 +9,17 @@
 #include "main.h"
 
 
-/**
+/*
+ * STATIC PROTOTYPES
+ */
+static void system_clock_config(void);
+static void GPIO_init(void);
+static void start_led_task(void *unused_arg);
+static void start_iot_task(void *unused_arg);
+static void log_device_info(void);
+
+
+/*
  *  GLOBALS
  */
 
@@ -33,7 +43,7 @@ const osThreadAttr_t iot_task_attributes = {
 
 // I2C-related values
 I2C_HandleTypeDef i2c;
-char forecast[32] = "None";
+char forecast[48] = "None";
 
 /**
  *  Theses variables may be changed by interrupt handler code,
@@ -128,7 +138,7 @@ uint32_t SECURE_SystemCoreClockUpdate() {
 /**
  * @brief System clock configuration.
  */
-void system_clock_config(void) {
+static void system_clock_config(void) {
     SystemCoreClockUpdate();
     HAL_InitTick(TICK_INT_PRIORITY);
 }
@@ -139,7 +149,7 @@ void system_clock_config(void) {
  *
  * Used to flash the Nucleo's USER LED, which is on GPIO Pin PA5.
  */
-void GPIO_init(void) {
+static void GPIO_init(void) {
     // Enable GPIO port clock
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
@@ -161,7 +171,7 @@ void GPIO_init(void) {
  *
  * @param *unused_arg: Not used.
  */
-void start_led_task(void *unused_arg) {
+static void start_led_task(void *unused_arg) {
     uint32_t last_tick = 0;
     bool connection_pixel_state = false;
 
@@ -193,7 +203,7 @@ void start_led_task(void *unused_arg) {
                     sleep_ms(1500);
                     new_forecast = false;
                 }
-                
+
                 // Set the top right pixel to flash when
                 // the device is disconnected.
                 if (!is_connected) {
@@ -201,7 +211,7 @@ void start_led_task(void *unused_arg) {
                 } else {
                     connection_pixel_state = false;
                 }
-                
+
                 // Draw the weather icon
                 HT16K33_draw_def_char(icon_code);
                 HT16K33_plot(7, 7, connection_pixel_state);
@@ -220,7 +230,7 @@ void start_led_task(void *unused_arg) {
  *
  * @param *unused_arg: Not used.
  */
-void start_iot_task(void *unused_arg) {
+static void start_iot_task(void *unused_arg) {
     // Get the Device ID and build number
     log_device_info();
 
@@ -282,7 +292,7 @@ void start_iot_task(void *unused_arg) {
 /**
  * @brief Show basic device info.
  */
-void log_device_info(void) {
+static void log_device_info(void) {
     uint8_t buffer[35] = { 0 };
     mvGetDeviceId(buffer, 34);
     server_log("Device: %s\n   App: %s\n Build: %i", buffer, APP_NAME, BUILD_NUM);

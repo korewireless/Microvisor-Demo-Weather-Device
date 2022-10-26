@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
-  * Version 2.0.4
+ * Version 2.0.4
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -18,9 +18,9 @@ struct {
 } http_handles = { 0, 0, 0 };
 
 // Central store for HTTP request management notification records.
-// Holds four records at a time -- each record is 16 bytes in size.
-volatile struct MvNotification http_notification_center[4];
-volatile struct MvNotification* notification_ptr = http_notification_center;
+// Holds HTTP_NT_BUFFER_SIZE_R records at a time -- each record is 16 bytes in size.
+volatile struct MvNotification http_notification_center[HTTP_NT_BUFFER_SIZE_R] __attribute__((aligned(8)));
+volatile uint32_t current_notification_index = 0;
 
 // Defined in `main.c`
 extern volatile bool        request_recv;
@@ -291,7 +291,8 @@ void http_process_response(void) {
                             temp = feels_like->valuedouble;
                         }
 
-                        sprintf(forecast, "    %s Out: %.1fc    ", cast, temp);
+                        sprintf(forecast, "    %s Out: %.1f", cast, temp);
+                        sprintf(&forecast[strlen(forecast)], "\x7F\x63\x20\x20\x20\x20");
                         icon_code = code;
                         new_forecast = true;
                     }
@@ -321,13 +322,20 @@ void http_process_response(void) {
  * and extract HTTP response data when it is available.
  */
 void TIM8_BRK_IRQHandler(void) {
-    // Get the event type
-    enum MvEventType event_kind = http_notification_center->event_type;
-
-    if (event_kind == MV_EVENTTYPE_CHANNELDATAREADABLE) {
+    // Check for a suitable event: readable data in the channel
+    volatile struct MvNotification notification = http_notification_center[current_notification_index];
+    if (notification.event_type == MV_EVENTTYPE_CHANNELDATAREADABLE) {
         // Flag we need to access received data and to close the HTTP channel
         // when we're back in the main loop. This lets us exit the ISR quickly.
         // We should not make Microvisor System Calls in the ISR.
         request_recv = true;
+
+        // Point to the next record to be written
+        current_notification_index++;
+        if (current_notification_index == HTTP_NT_BUFFER_SIZE_R) current_notification_index = 0;
+
+        // Clear the current notifications event
+        // See https://www.twilio.com/docs/iot/microvisor/microvisor-notifications#buffer-overruns
+        notification.event_type = 0;
     }
 }

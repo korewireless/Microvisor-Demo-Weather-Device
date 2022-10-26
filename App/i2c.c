@@ -1,14 +1,22 @@
 /**
  *
  * Microvisor Weather Device Demo
-  * Version 2.0.4
+ * Version 2.0.4
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
  */
 #include "main.h"
 
+/*
+ * STATIC PROTOTYPES
+ */
+static bool I2C_check(uint8_t addr);
 
+
+/*
+ * GLOBALS
+ */
 extern      I2C_HandleTypeDef   i2c;
 extern      bool                use_i2c;
 
@@ -39,7 +47,7 @@ void I2C_init() {
 }
 
 
-bool I2C_check(uint8_t addr) {
+static bool I2C_check(uint8_t addr) {
     uint8_t timeout_count = 0;
 
     while(true) {

@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
-  * Version 2.0.4
+ * Version 2.0.4
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -9,6 +9,16 @@
 #include "main.h"
 
 
+/*
+ * STATIC PROTOTYPES
+ */
+static void HT16K33_write_cmd(uint8_t cmd);
+static void HT16K33_rotate(uint8_t angle);
+
+
+/*
+ * GLOBALS
+ */
 // Defined in `main.c`
 extern I2C_HandleTypeDef i2c;
 
@@ -146,7 +156,7 @@ void HT16K33_init(uint8_t angle) {
  *
  * @param cmd: The single-byte command.
  */
-void HT16K33_write_cmd(uint8_t cmd) {
+static void HT16K33_write_cmd(uint8_t cmd) {
     HAL_I2C_Master_Transmit(&i2c, HT16K33_I2C_ADDR << 1, &cmd, 1, 100);
 }
 
@@ -296,7 +306,7 @@ void HT16K33_define_character(const char* sprite, uint8_t code) {
 }
 
 
-void HT16K33_rotate(uint8_t angle) {
+static void HT16K33_rotate(uint8_t angle) {
     uint8_t temp[8] = { 0 };
     uint8_t a = 0;
     uint8_t line_value = 0;

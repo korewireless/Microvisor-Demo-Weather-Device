@@ -28,5 +28,4 @@ bool        http_send_request(const char* url);
 void        http_process_response(void);
 
 
-
 #endif      // _HTTP_H_

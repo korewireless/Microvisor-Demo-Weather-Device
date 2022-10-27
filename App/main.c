@@ -22,7 +22,6 @@ static void log_device_info(void);
 /*
  *  GLOBALS
  */
-
 // This is the FreeRTOS thread task that flashed the USER LED
 // and operates the display
 osThreadId_t LEDTask;

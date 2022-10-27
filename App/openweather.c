@@ -9,6 +9,9 @@
 #include "main.h"
 
 
+/*
+ * GLOBALS
+ */
 char request_url[165] = { 0 };
 
 

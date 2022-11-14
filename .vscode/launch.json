@@ -10,7 +10,7 @@
             "preLaunchTask": "start_gdb_server",
             "gdbpath": "/usr/bin/gdb-multiarch",
             "debugger_args": ["-l", "10", "--nx"],
-            "executable": "${workspaceRoot}/build/App/mv-iot-device-demo.elf",
+            "executable": "${workspaceRoot}/build/App/mv-weather-device-demo.elf",
             "printCalls": false,
             "valuesFormatting": "parseText",
             "showDevDebugOutput": false,
@@ -19,4 +19,3 @@
     ],
     "version": "0.2.0"
 }
-

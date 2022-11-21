@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 2.0.5
+ * Version 2.0.6
  * Copyright © 2022, Twilio
  * Licence: Apache 2.0
  *
@@ -294,7 +294,7 @@ static void start_iot_task(void *unused_arg) {
 static void log_device_info(void) {
     uint8_t buffer[35] = { 0 };
     mvGetDeviceId(buffer, 34);
-    server_log("Device: %s\n   App: %s\n Build: %i", buffer, APP_NAME, BUILD_NUM);
+    server_log("Info:\nDevice: %s\n   App: %s\n Build: %i", buffer, APP_NAME, BUILD_NUM);
 }
 
 

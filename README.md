@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo 2.0.5
+# Twilio Microvisor Weather Device Demo 2.0.6
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -10,11 +10,11 @@ The application code files can be found in the [`App/`](App/) directory. The [`S
 
 ## Release Notes
 
+Version 2.0.6 adds [Docker support](#docker).
+
 Version 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
 
 Version 2.0.0 replaces earlier `printf()`-based application logging with Microvisor’s application logging system calls.
-
-Versions prior to 1.2.0 include a version of the `deploy.sh` script which is no longer compatible with the Microvisor REST API.
 
 ## Cloning the Repo
 
@@ -65,9 +65,35 @@ The display are shown on breakout boards which include I2C pull-up resistors. If
 
 ## Software Setup
 
-This project is written in C. At this time, we only support Ubuntu 20.0.4. Users of other operating systems should build the code under a virtual machine running Ubuntu.
+This project is written in C. At this time, we only support Ubuntu 20.0.4. Users of other operating systems should build the code under a virtual machine running Ubuntu, or with Docker.
 
-**Note** macOS users may attempt to install the pre-requisites below using [Homebrew](https://brew.sh). This is not supported, but should work. You may need to change the names of a few of the packages listed in the `apt install` command below.
+**Note** Users of unsupported platforms may attempt to install the Microvisor toolchain using [this guidance](https://www.twilio.com/docs/iot/microvisor/install-microvisor-app-development-tools-on-unsupported-platforms).
+
+### Docker
+
+If you are running on an architecture other than x86/amd64 (such as a Mac with Apple silicon), you will need to override the platform when running docker. This is needed for the Twilio CLI apt package which is x86 only at this time:
+
+```shell
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
+
+Build the image:
+
+```shell
+docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t mv-weather-demo-image .
+```
+
+Run the build:
+
+```
+docker run -it --rm -v $(pwd)/:/home/mvisor/project/ \
+  --env-file env.list \
+  --name mv-weather-demo mv-weather-demo-image
+```
+
+**Note** You will need to have exported certain environment variables, as [detailed below](#environment-variables).
+
+Under Docker, the demo is compiled, uploaded and deployed to your development board. It also initiates logging — hit <b>ctrl</b>-<b>c</b> to break out to the command prompt.
 
 ### Pre-requisites
 
@@ -118,9 +144,7 @@ Enter the following command to get your target device’s SID and, if set, its u
 twilio api:microvisor:v1:devices:list
 ```
 
-#### OpenWeather
-
-Before you build the app, set the following environment variables:
+Before you build the app, set the following OpenWeather environment variables:
 
 ```bash
 export MVOW_API_KEY="<YOUR_OPEN_WEATHER_API_KEY>"

@@ -10,6 +10,8 @@ The application code files can be found in the [`App/`](App/) directory. The [`S
 
 ## Release Notes
 
+Version 2.0.7 adds optional [logging over UART](#uart-logging).
+
 Version 2.0.6 adds [Docker support](#docker).
 
 Version 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
@@ -177,6 +179,10 @@ For more information, run
 ```bash
 ./deploy.sh --help
 ```
+
+## UART Logging
+
+Version 2.0.7 adds optional logging over UART on pin PD5 — pin 41 in bank CN11 on the Microvisor Nucleo Development Board. To use this mode, which is intended as an alternative to application logging, typically when a device is disconnected, connect a 3V3 FTDI USB-to-Serial adapter cable’s RX pin to PD5, and a GND pin to any Nucleo GND pin. Whether you do this or not, the application will continue to log via the Internet.
 
 ## Remote debugging
 

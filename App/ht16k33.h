@@ -1,13 +1,18 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 2.0.6
- * Copyright © 2022, Twilio
+ * Version 2.0.7
+ * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
  */
 #ifndef _HT16K33_HEADER_
 #define _HT16K33_HEADER_
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*
@@ -30,6 +35,11 @@ void        HT16K33_plot(uint8_t x, uint8_t y, bool is_set);
 void        HT16K33_print(const char *text, uint32_t delay_ms);
 void        HT16K33_define_character(const char* sprite, uint8_t index);
 void        HT16K33_draw_def_char(uint8_t v);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif  // _HT16K33_HEADER_

@@ -1,8 +1,8 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 2.0.6
- * Copyright © 2022, Twilio
+ * Version 2.0.7
+ * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
  */
@@ -14,8 +14,8 @@
  */
 static void system_clock_config(void);
 static void GPIO_init(void);
-static void start_led_task(void *unused_arg);
-static void start_iot_task(void *unused_arg);
+static void task_led(void *unused_arg);
+static void task_iot(void *unused_arg);
 static void log_device_info(void);
 
 
@@ -24,7 +24,7 @@ static void log_device_info(void);
  */
 // This is the FreeRTOS thread task that flashed the USER LED
 // and operates the display
-osThreadId_t LEDTask;
+osThreadId_t thread_led;
 const osThreadAttr_t led_task_attributes = {
     .name = "LEDTask",
     .stack_size = 2048,
@@ -33,7 +33,7 @@ const osThreadAttr_t led_task_attributes = {
 
 // This is the FreeRTOS thread task that reads the sensor
 // and displays the temperature on the LED
-osThreadId_t IOTTask;
+osThreadId_t thread_iot;
 const osThreadAttr_t iot_task_attributes = {
     .name = "IOTTask",
     .stack_size = 4096,
@@ -70,6 +70,7 @@ extern struct {
  * @brief The application entry point.
  */
 int main(void) {
+    
     // Reset of all peripherals, Initializes the Flash interface and the Systick.
     HAL_Init();
 
@@ -108,8 +109,8 @@ int main(void) {
     osKernelInitialize();
 
     // Create the thread(s)
-    IOTTask = osThreadNew(start_iot_task, NULL, &iot_task_attributes);
-    LEDTask = osThreadNew(start_led_task, NULL, &led_task_attributes);
+    thread_iot = osThreadNew(task_iot, NULL, &iot_task_attributes);
+    thread_led = osThreadNew(task_led, NULL, &led_task_attributes);
 
     // Start the scheduler
     osKernelStart();
@@ -128,6 +129,7 @@ int main(void) {
  * @retval The clock value.
  */
 uint32_t SECURE_SystemCoreClockUpdate() {
+    
     uint32_t clock = 0;
     mvGetHClk(&clock);
     return clock;
@@ -138,6 +140,7 @@ uint32_t SECURE_SystemCoreClockUpdate() {
  * @brief System clock configuration.
  */
 static void system_clock_config(void) {
+    
     SystemCoreClockUpdate();
     HAL_InitTick(TICK_INT_PRIORITY);
 }
@@ -149,6 +152,7 @@ static void system_clock_config(void) {
  * Used to flash the Nucleo's USER LED, which is on GPIO Pin PA5.
  */
 static void GPIO_init(void) {
+    
     // Enable GPIO port clock
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
@@ -170,7 +174,8 @@ static void GPIO_init(void) {
  *
  * @param *unused_arg: Not used.
  */
-static void start_led_task(void *unused_arg) {
+static void task_led(void *unused_arg) {
+    
     uint32_t last_tick = 0;
     bool connection_pixel_state = false;
 
@@ -229,7 +234,8 @@ static void start_led_task(void *unused_arg) {
  *
  * @param *unused_arg: Not used.
  */
-static void start_iot_task(void *unused_arg) {
+static void task_iot(void *unused_arg) {
+    
     // Get the Device ID and build number
     log_device_info();
 
@@ -292,9 +298,12 @@ static void start_iot_task(void *unused_arg) {
  * @brief Show basic device info.
  */
 static void log_device_info(void) {
+    
     uint8_t buffer[35] = { 0 };
     mvGetDeviceId(buffer, 34);
-    server_log("Info:\nDevice: %s\n   App: %s\n Build: %i", buffer, APP_NAME, BUILD_NUM);
+    server_log("Device: %s", buffer);
+    server_log("   App: %s %s", APP_NAME, APP_VERSION);
+    server_log(" Build: %i", BUILD_NUM);
 }
 
 
@@ -304,6 +313,7 @@ static void log_device_info(void) {
  * @param ms: A sleep period in ms.
  */
 void sleep_ms(uint32_t ms) {
+    
     uint32_t tick = HAL_GetTick();
     while (1) {
         if (HAL_GetTick() - tick > ms) break;

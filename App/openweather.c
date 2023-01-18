@@ -1,8 +1,8 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 2.0.6
- * Copyright © 2022, Twilio
+ * Version 2.0.7
+ * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
  */
@@ -21,6 +21,7 @@ char request_url[165] = { 0 };
  *
  */
 void OW_init(const char* api_key, double lat, double lng) {
+    
     // Create the access URL using sprintf()
     sprintf(request_url, "%s?lat=%.6f&lon=%.6f&appid=%s&exclude=minutely,hourly,daily,alerts&units=metric", FORECAST_BASE_URL, lat, lng, api_key);
 }
@@ -32,5 +33,6 @@ void OW_init(const char* api_key, double lat, double lng) {
  * @retval Whether the request was issued (`true`) or not (`false`)
  */
 bool OW_request_forecast(void) {
+    
     return http_send_request(request_url);
 }

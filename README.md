@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo 2.0.6
+# Twilio Microvisor Weather Device Demo 2.0.7
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -51,7 +51,7 @@ Get your location — or any location co-ordinates — from [Google Maps](https:
 
 You will also need the following hardware:
 
-* A Twilio Microvisor Nucleo Development Board. These are currently only available to Private Beta program participants. You will need to solder male header pins to the two GPIO banks on the board, or at the very least to the connected pins shown in the circuit diagram below.
+* A Twilio Microvisor Nucleo Development Board. You will need to solder male header pins to the two GPIO banks on the board, or at the very least to the connected pins shown in the circuit diagram below.
 * An HT16K33-based 8x8 matrix display, e.g., [Adafruit 1.2-inch 8x8 LED Matrix and Backpack](https://www.adafruit.com/product/1856).
 * Four female-to-female jumper wires.
 
@@ -188,7 +188,7 @@ set(ENABLE_REMOTE_DEBUGGING 1)
 
 in the root `CMakeLists.txt` file to `0` to disable this.
 
-Enabling remote debugging in the build does not initiate a GDB session — you will have to do this manually. Follow the instructions in the [Microvisor documentation](https://www.twilio.com/docs/iot/microvisor/microvisor-remote-debugging) **Private Beta participants only**
+Enabling remote debugging in the build does not initiate a GDB session — you will have to do this manually. Follow the instructions in the [Microvisor documentation](https://www.twilio.com/docs/iot/microvisor/microvisor-remote-debugging).
 
 This repo contains a `.gdbinit` file which sets the remote target to localhost on port 8001 to match the Twilio CLI Microvisor plugin remote debugging defaults.
 
@@ -204,7 +204,7 @@ Alternatively, generate the keys manually and pass their locations to the deploy
 
 ## Copyright and Licensing
 
-The sample code and Microvisor SDK is © 2022, Twilio, Inc. It is licensed under the terms of the [Apache 2.0 License](./LICENSE).
+The sample code and Microvisor SDK is © 2023, Twilio, Inc. It is licensed under the terms of the [Apache 2.0 License](./LICENSE).
 
 The SDK makes use of code © 2021, STMicroelectronics and affiliates. This code is licensed under terms described in [this file](https://github.com/twilio/twilio-microvisor-hal-stm32u5/blob/main/LICENSE-STM32CubeU5.md).
 

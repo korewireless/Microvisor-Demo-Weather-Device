@@ -1,8 +1,8 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 2.0.6
- * Copyright © 2022, Twilio
+ * Version 2.0.7
+ * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
  */
@@ -21,6 +21,9 @@ extern      I2C_HandleTypeDef   i2c;
 extern      bool                use_i2c;
 
 
+/**
+ *  @brief Initialize STM32U585 I2C1
+ */
 void I2C_init() {
     // Configure I2C1
     // I2C1 pins are:
@@ -47,7 +50,15 @@ void I2C_init() {
 }
 
 
+/**
+ *  @brief Check for presence of a known device by its I2C address.
+ *
+ *  @param addr: The device's address.
+ *
+ *  @returns `true` if the device is present, otherwise `false`.
+ */
 static bool I2C_check(uint8_t addr) {
+    
     uint8_t timeout_count = 0;
 
     while(true) {
@@ -75,7 +86,11 @@ static bool I2C_check(uint8_t addr) {
 }
 
 
-void I2C_Scan() {
+/**
+ *  @brief Scan for and list I2C devices on the bus.
+ */
+void I2C_scan(void) {
+    
     uint8_t data = 0;
     for (uint8_t i = 2 ; i < 256 ; i += 2) {
         if (HAL_I2C_Master_Receive(&i2c, i , &data, 1, 10) == HAL_OK) {
@@ -85,7 +100,13 @@ void I2C_Scan() {
 }
 
 
+/**
+ *  @brief HAL-called initialization function.
+ *
+ *  @param i2c: The target I2C bus.
+ */
 void HAL_I2C_MspInit(I2C_HandleTypeDef *i2c) {
+    
     // This SDK-named function is called by HAL_I2C_Init()
 
     // Configure U5 peripheral clock

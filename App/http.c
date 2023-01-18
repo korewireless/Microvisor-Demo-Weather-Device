@@ -1,8 +1,8 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 2.0.6
- * Copyright © 2022, Twilio
+ * Version 2.0.7
+ * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
  */
@@ -38,6 +38,7 @@ extern          char        forecast[32];
  *  @retval `true` if the channel is open, otherwise `false`.
  */
 bool http_open_channel(void) {
+    
     // Set up the HTTP channel's multi-use send and receive buffers
     static volatile uint8_t http_rx_buffer[HTTP_RX_BUFFER_SIZE_B] __attribute__((aligned(512)));
     static volatile uint8_t http_tx_buffer[HTTP_TX_BUFFER_SIZE_B] __attribute__((aligned(512)));
@@ -85,6 +86,7 @@ bool http_open_channel(void) {
  *  @brief Close the currently open HTTP channel.
  */
 void http_close_channel(void) {
+    
     // If we have a valid channel handle -- ie. it is non-zero --
     // then ask Microvisor to close it and confirm acceptance of
     // the closure request.
@@ -103,6 +105,7 @@ void http_close_channel(void) {
  * @brief Configure the channel Notification Center.
  */
 void http_channel_center_setup(void) {
+    
     // Clear the notification store
     memset((void *)http_notification_center, 0xFF, sizeof(http_notification_center));
 
@@ -131,6 +134,7 @@ void http_channel_center_setup(void) {
  * @retval `true` if the request was accepted by Microvisor, otherwise `false`
  */
 bool http_send_request(const char* url) {
+    
     // Check for a valid channel handle
     if (http_handles.channel != 0) {
         server_log("Sending HTTP request");
@@ -174,6 +178,7 @@ bool http_send_request(const char* url) {
  * @brief Process HTTP response data.
  */
 void http_process_response(void) {
+    
     // We have received data via the active HTTP channel so establish
     // an `MvHttpResponseData` record to hold response metadata
     struct MvHttpResponseData resp_data;
@@ -325,6 +330,7 @@ void http_process_response(void) {
  * and extract HTTP response data when it is available.
  */
 void TIM8_BRK_IRQHandler(void) {
+    
     // Check for a suitable event: readable data in the channel
     volatile struct MvNotification notification = http_notification_center[current_notification_index];
     if (notification.event_type == MV_EVENTTYPE_CHANNELDATAREADABLE) {

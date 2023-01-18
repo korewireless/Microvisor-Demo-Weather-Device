@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 
 # Set application data
 set(APP "Microvisor Weather Demo")
-set(VERSION_NUMBER "2.0.6")
-set(BUILD_NUMBER "0")
+set(VERSION_NUMBER "2.0.7")
+set(BUILD_NUMBER "3")
 
 message("Building ${APP} ${VERSION_NUMBER} build ${BUILD_NUMBER}")
 
@@ -39,6 +39,7 @@ add_executable(${PROJECT_NAME}
     http.c
     i2c.c
     logging.c
+    uart_logging.c
     openweather.c
     stm32u5xx_hal_timebase_tim_template.c
 )

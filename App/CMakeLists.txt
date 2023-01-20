@@ -35,7 +35,7 @@ endif()
 add_executable(${PROJECT_NAME}
     main.c
     cJSON.c
-    ht16k33.c
+    ht16k33-matrix.c
     http.c
     i2c.c
     logging.c

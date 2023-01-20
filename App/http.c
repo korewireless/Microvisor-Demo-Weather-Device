@@ -22,8 +22,8 @@ struct {
 
 // Central store for HTTP request management notification records.
 // Holds HTTP_NT_BUFFER_SIZE_R records at a time -- each record is 16 bytes in size.
-volatile struct MvNotification http_notification_center[HTTP_NT_BUFFER_SIZE_R] __attribute__((aligned(8)));
-volatile uint32_t current_notification_index = 0;
+static volatile struct MvNotification http_notification_center[HTTP_NT_BUFFER_SIZE_R] __attribute__((aligned(8)));
+static volatile uint32_t current_notification_index = 0;
 
 // Defined in `main.c`
 extern volatile bool        request_recv;
@@ -72,12 +72,11 @@ bool http_open_channel(void) {
     // and confirm that it has accepted the request
     enum MvStatus status = mvOpenChannel(&channel_config, &http_handles.channel);
     if (status == MV_STATUS_OKAY) {
-        server_log("HTTP channel open. Handle: %lu", (uint32_t)http_handles.channel);
+        server_log("HTTP channel handle: %lu", (uint32_t)http_handles.channel);
         return true;
-    } else {
-        server_error("HTTP channel closed. Status: %i", status);
     }
-
+    
+    server_error("Could not open HTTP channel. Status: %i", status);
     return false;
 }
 
@@ -91,13 +90,14 @@ void http_close_channel(void) {
     // then ask Microvisor to close it and confirm acceptance of
     // the closure request.
     if (http_handles.channel != 0) {
+        MvChannelHandle old = http_handles.channel;
         enum MvStatus status = mvCloseChannel(&http_handles.channel);
-        assert((status == MV_STATUS_OKAY || status == MV_STATUS_CHANNELCLOSED) && "[ERROR] Channel closure");
-        server_log("HTTP channel closed");
+        do_assert((status == MV_STATUS_OKAY || status == MV_STATUS_CHANNELCLOSED), "Channel closure");
+        server_log("HTTP channel %lu closed", (uint32_t)old);
     }
 
     // Confirm the channel handle has been invalidated by Microvisor
-    assert(http_handles.channel == 0 && "[ERROR] Channel handle not zero");
+    do_assert(http_handles.channel == 0, "Channel handle not zero");
 }
 
 
@@ -119,12 +119,12 @@ void http_channel_center_setup(void) {
     // Ask Microvisor to establish the notification center
     // and confirm that it has accepted the request
     enum MvStatus status = mvSetupNotifications(&http_notification_setup, &http_handles.notification);
-    assert(status == MV_STATUS_OKAY && "[ERROR] Could not set up HTTP channel NC");
+    do_assert(status == MV_STATUS_OKAY, "Could not set up HTTP channel NC");
 
     // Start the notification IRQ
     NVIC_ClearPendingIRQ(TIM8_BRK_IRQn);
     NVIC_EnableIRQ(TIM8_BRK_IRQn);
-    server_log("Notification center handle: %lu", (uint32_t)http_handles.notification);
+    server_log("HTTP NC handle: %lu", (uint32_t)http_handles.notification);
 }
 
 
@@ -133,7 +133,7 @@ void http_channel_center_setup(void) {
  *
  * @retval `true` if the request was accepted by Microvisor, otherwise `false`
  */
-bool http_send_request(const char* url) {
+enum MvStatus http_send_request(const char* url) {
     
     // Check for a valid channel handle
     if (http_handles.channel != 0) {
@@ -159,12 +159,11 @@ bool http_send_request(const char* url) {
         enum MvStatus status = mvSendHttpRequest(http_handles.channel, &request_config);
         if (status == MV_STATUS_OKAY) {
             server_log("Request sent to Twilio");
-            return true;
+        } else {
+            server_error("Could not issue request. Status: %i", status);
         }
-
-        // Report send failure
-        server_error("Could not issue request. Status: %i", status);
-        return false;
+        
+        return status;
     }
 
     // There's no open channel, so open open one now and

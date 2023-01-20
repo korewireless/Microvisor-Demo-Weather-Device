@@ -31,7 +31,7 @@
 // App includes
 #include "logging.h"
 #include "uart_logging.h"
-#include "ht16k33.h"
+#include "ht16k33-matrix.h"
 #include "i2c.h"
 #include "http.h"
 #include "openweather.h"

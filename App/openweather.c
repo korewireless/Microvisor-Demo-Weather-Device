@@ -12,7 +12,7 @@
 /*
  * GLOBALS
  */
-char request_url[165] = { 0 };
+static char request_url[165] = { 0 };
 
 
 /**
@@ -34,5 +34,5 @@ void OW_init(const char* api_key, double lat, double lng) {
  */
 bool OW_request_forecast(void) {
     
-    return http_send_request(request_url);
+    return (http_send_request(request_url) == MV_STATUS_OKAY);
 }

@@ -22,10 +22,10 @@ extern      bool                use_i2c;
 
 
 /**
- *  @brief Initialize STM32U585 I2C1
+ * @brief Initialize STM32U585 I2C1.
  */
-void I2C_init() {
-    // Configure I2C1
+void I2C_init(void) {
+    
     // I2C1 pins are:
     //   SDA -> PB9
     //   SCL -> PB6
@@ -51,11 +51,11 @@ void I2C_init() {
 
 
 /**
- *  @brief Check for presence of a known device by its I2C address.
+ * @brief Check for presence of a known device by its I2C address.
  *
- *  @param addr: The device's address.
+ * @param addr: The device's address.
  *
- *  @returns `true` if the device is present, otherwise `false`.
+ * @returns `true` if the device is present, otherwise `false`.
  */
 static bool I2C_check(uint8_t addr) {
     
@@ -87,7 +87,7 @@ static bool I2C_check(uint8_t addr) {
 
 
 /**
- *  @brief Scan for and list I2C devices on the bus.
+ * @brief Scan for and list I2C devices on the bus.
  */
 void I2C_scan(void) {
     
@@ -101,9 +101,9 @@ void I2C_scan(void) {
 
 
 /**
- *  @brief HAL-called initialization function.
+ * @brief HAL-called function to configure I2C.
  *
- *  @param i2c: The target I2C bus.
+ * @param i2c: A HAL I2C_HandleTypeDef pointer to the I2C instance.
  */
 void HAL_I2C_MspInit(I2C_HandleTypeDef *i2c) {
     
@@ -124,7 +124,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *i2c) {
     __HAL_RCC_GPIOB_CLK_ENABLE();
 
     // Configure the GPIO pins for I2C
-    // Pin PB6 - SCK
+    // Pin PB6 - SCL
     // Pin PB9 - SDA
     GPIO_InitTypeDef gpioConfig = { 0 };
     gpioConfig.Pin       = GPIO_PIN_6 | GPIO_PIN_9;

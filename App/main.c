@@ -24,20 +24,20 @@ static void log_device_info(void);
  */
 // This is the FreeRTOS thread task that flashed the USER LED
 // and operates the display
-osThreadId_t thread_led;
-const osThreadAttr_t led_task_attributes = {
+static osThreadId_t thread_led;
+static const osThreadAttr_t led_task_attributes = {
     .name = "LEDTask",
-    .stack_size = 2048,
-    .priority = (osPriority_t) osPriorityNormal
+    .stack_size = 2560,
+    .priority = (osPriority_t)osPriorityNormal
 };
 
 // This is the FreeRTOS thread task that reads the sensor
 // and displays the temperature on the LED
-osThreadId_t thread_iot;
-const osThreadAttr_t iot_task_attributes = {
+static osThreadId_t thread_iot;
+static const osThreadAttr_t iot_task_attributes = {
     .name = "IOTTask",
-    .stack_size = 4096,
-    .priority = (osPriority_t) osPriorityNormal
+    .stack_size = 5120,
+    .priority = (osPriority_t)osPriorityNormal
 };
 
 // I2C-related values
@@ -49,12 +49,13 @@ char forecast[48] = "None";
  *  so we mark them as `volatile` to ensure compiler optimization
  *  doesn't render them immutable at runtime
  */
-volatile bool       use_i2c = false;
-volatile bool       request_recv = false;
-volatile bool       new_forecast = false;
-volatile bool       is_connected = false;
-volatile bool       net_changed = false;
-volatile uint8_t    icon_code = 12;
+volatile bool           use_i2c = false;
+volatile uint8_t        icon_code = 12;
+volatile bool           new_forecast = false;
+volatile bool           request_recv = false;
+
+static volatile bool    is_connected = false;
+static volatile bool    net_changed = false;
 
 /**
  * These variables are defined in `http.c`
@@ -76,6 +77,9 @@ int main(void) {
 
     // Configure the system clock
     system_clock_config();
+    
+    // Get the Device ID and build number
+    log_device_info();
 
     // Initialize the peripherals
     GPIO_init();
@@ -236,9 +240,6 @@ static void task_led(void *unused_arg) {
  */
 static void task_iot(void *unused_arg) {
     
-    // Get the Device ID and build number
-    log_device_info();
-
     // Set up channel notifications
     http_channel_center_setup();
 
@@ -269,9 +270,7 @@ static void task_iot(void *unused_arg) {
         }
 
         // Process a request's response if indicated by the ISR
-        if (request_recv) {
-            http_process_response();
-        }
+        if (request_recv) http_process_response();
 
         // Use 'kill_time' to force-close an open HTTP channel
         // if it's been left open too long

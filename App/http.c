@@ -26,7 +26,8 @@ static volatile struct MvNotification http_notification_center[HTTP_NT_BUFFER_SI
 static volatile uint32_t current_notification_index = 0;
 
 // Defined in `main.c`
-extern volatile bool        request_recv;
+extern volatile bool        received_request;
+extern volatile bool        channel_was_closed;
 extern volatile bool        new_forecast;
 extern volatile uint32_t    icon_code;
 extern          char        forecast[32];
@@ -136,189 +137,42 @@ void http_channel_center_setup(void) {
 enum MvStatus http_send_request(const char* url) {
     
     // Check for a valid channel handle
-    if (http_handles.channel != 0) {
-        server_log("Sending HTTP request");
-
-        // Set up the request
-        const char verb[] = "GET";
-        const char body[] = "";
-        struct MvHttpHeader hdrs[] = {};
-        struct MvHttpRequest request_config = {
-            .method = (uint8_t *)verb,
-            .method_len = strlen(verb),
-            .url = (uint8_t *)url,
-            .url_len = strlen(url),
-            .num_headers = 0,
-            .headers = hdrs,
-            .body = (uint8_t *)body,
-            .body_len = strlen(body),
-            .timeout_ms = 10000
-        };
-
-        // Issue the request -- and check its status
-        enum MvStatus status = mvSendHttpRequest(http_handles.channel, &request_config);
-        if (status == MV_STATUS_OKAY) {
-            server_log("Request sent to Twilio");
-        } else {
-            server_error("Could not issue request. Status: %i", status);
-        }
-        
-        return status;
+    if (http_handles.channel == 0) {
+        // There's no open channel, so open open one now and
+        // try to send again
+        http_open_channel();
+        return http_send_request(url);
     }
 
-    // There's no open channel, so open open one now and
-    // try to send again
-    http_open_channel();
-    return http_send_request(url);
-}
+    server_log("Sending HTTP request");
 
+    // Set up the request
+    const char verb[] = "GET";
+    const char body[] = "";
+    struct MvHttpHeader hdrs[] = {};
+    struct MvHttpRequest request_config = {
+        .method = (uint8_t *)verb,
+        .method_len = strlen(verb),
+        .url = (uint8_t *)url,
+        .url_len = strlen(url),
+        .num_headers = 0,
+        .headers = hdrs,
+        .body = (uint8_t *)body,
+        .body_len = strlen(body),
+        .timeout_ms = 10000
+    };
 
-/**
- * @brief Process HTTP response data.
- */
-void http_process_response(void) {
-    
-    // We have received data via the active HTTP channel so establish
-    // an `MvHttpResponseData` record to hold response metadata
-    struct MvHttpResponseData resp_data;
-    enum MvStatus status = mvReadHttpResponseData(http_handles.channel, &resp_data);
+    // Issue the request -- and check its status
+    enum MvStatus status = mvSendHttpRequest(http_handles.channel, &request_config);
     if (status == MV_STATUS_OKAY) {
-        // Check we successfully issued the request (`result` is OK) and
-        // the request was successful (status code 200)
-        if (resp_data.result == MV_HTTPRESULT_OK) {
-            if (resp_data.status_code == 200) {
-                server_log("HTTP response body length: %lu", resp_data.body_length);
-
-                // Set up a buffer that we'll get Microvisor
-                // to write the response body into
-                static uint8_t body_buffer[1500];
-                memset((void *)body_buffer, 0x00, 1500);
-                status = mvReadHttpResponseBody(http_handles.channel, 0, body_buffer, 1500);
-                if (status == MV_STATUS_OKAY) {
-                    uint32_t wid = 0;
-                    uint32_t code = NONE;
-                    double temp = 0.0;
-                    char cast[14] = "None";
-
-                    // Parse the incoming JSON using cJSON
-                    // (https://github.com/DaveGamble/cJSON)
-                    cJSON *json = cJSON_Parse((char *)body_buffer);
-                    if (json == NULL) {
-                        // Parsing failed -- log an error and bail
-                        const char *error_ptr = cJSON_GetErrorPtr();
-                        if (error_ptr != NULL) {
-                            server_error("Cant parse JSON, before %s", error_ptr);
-                        }
-                        cJSON_Delete(json);
-                        return;
-                    }
-
-                    // Extract current weather conditions from parsed JSON
-                    const cJSON *current = cJSON_GetObjectItemCaseSensitive(json, "current");
-                    const cJSON *weather = cJSON_GetObjectItemCaseSensitive(current, "weather");
-                    const cJSON *feels_like;
-
-                    if (weather != NULL) {
-                        cJSON *item = NULL;
-                        cJSON_ArrayForEach(item, weather) {
-                            // Get the info we're interested in
-                            const cJSON *icon = cJSON_GetObjectItemCaseSensitive(item, "icon");
-                            const cJSON *id = cJSON_GetObjectItemCaseSensitive(item, "id");
-                            const cJSON *main= cJSON_GetObjectItemCaseSensitive(item, "main");
-                            feels_like = cJSON_GetObjectItemCaseSensitive(current, "feels_like");
-
-                            // Set working values
-                            if (cJSON_IsNumber(id)) wid = (int)id->valuedouble;
-                            if (cJSON_IsString(main) && (main->valuestring != NULL)) {
-                                strcpy(cast, main->valuestring);
-                            }
-
-                            // Set standard icon values by weather condition
-                            if (strcmp(cast, "Rain") == 0) {
-                                code = RAIN;
-                            } else if (strcmp(cast, "Snow") == 0) {
-                                code = SNOW;
-                            } else if (strcmp(cast, "Thun") == 0) {
-                                code = THUNDERSTORM;
-                            }
-
-                            // Update icons and/or condition text for certain
-                            // quirky ID values
-                            if (wid == 771) {
-                                strcpy(cast, "Windy");
-                                code = WIND;
-                            }
-
-                            if (wid == 871) {
-                                strcpy(cast, "Tornado");
-                                code = TORNADO;
-                            }
-
-                            if (wid > 699 && wid < 770) {
-                                strcpy(cast, "Foggy");
-                                code = FOG;
-                            }
-
-                            if (strcmp(cast, "Clouds") == 0) {
-                                if (wid < 804) {
-                                    strcpy(cast, "Partly Cloudy");
-                                    code = PARTLY_CLOUDY;
-                                } else {
-                                    strcpy(cast, "Cloudy");
-                                    code = CLOUDY;
-                                }
-                            }
-
-                            if (wid > 602 && wid < 620) {
-                                strcpy(cast, "Sleet");
-                                code = SLEET;
-                            }
-
-                            if (strcmp(cast, "Drizzle") == 0) {
-                                code = DRIZZLE;
-                            }
-
-                            if (strcmp(cast, "Clear") == 0) {
-                                if (cJSON_IsString(icon) && (icon->valuestring != NULL)) {
-                                    if (icon->valuestring[2] == 'd') {
-                                        code = CLEAR_DAY;
-                                    } else {
-                                        code = CLEAR_NIGHT;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Did we get updated weather info?
-                    if (wid > 0) {
-                        // Yes! So update the forecast string, and tell the main loop
-                        // to refresh the display
-                        if (cJSON_IsNumber(feels_like)) {
-                            temp = feels_like->valuedouble;
-                        }
-
-                        sprintf(forecast, "    %s Out: %.1f", cast, temp);
-                        sprintf(&forecast[strlen(forecast)], "\x7F\x63\x20\x20\x20\x20");
-                        icon_code = code;
-                        new_forecast = true;
-                    }
-
-                    // Free the JSON parser
-                    cJSON_Delete(json);
-                    server_log("Forecast: %s (code: %lu) Feels Like %.1fc", cast, code, temp);
-                } else {
-                    server_error("HTTP response body read status %i", status);
-                }
-            } else {
-                server_error("HTTP status code: %lu", resp_data.status_code);
-            }
-        } else {
-            server_error("Request failed. Status: %i", resp_data.result);
-        }
+        server_log("Request sent to Twilio");
+    } else if (status == MV_STATUS_CHANNELCLOSED) {
+        server_error("HTTP channel %lu already closed", (uint32_t)http_handles.channel);
     } else {
-        server_error("Response data read failed. Status: %i", status);
+        server_error("Could not issue request. Status: %i", status);
     }
+    
+    return status;
 }
 
 
@@ -331,13 +185,22 @@ void http_process_response(void) {
 void TIM8_BRK_IRQHandler(void) {
     
     // Check for a suitable event: readable data in the channel
+    bool got_notification = false;
     volatile struct MvNotification notification = http_notification_center[current_notification_index];
     if (notification.event_type == MV_EVENTTYPE_CHANNELDATAREADABLE) {
         // Flag we need to access received data and to close the HTTP channel
         // when we're back in the main loop. This lets us exit the ISR quickly.
         // We should not make Microvisor System Calls in the ISR.
-        request_recv = true;
-
+        received_request = true;
+        got_notification = true;
+    }
+    
+    if (notification.event_type == MV_EVENTTYPE_CHANNELNOTCONNECTED) {
+        channel_was_closed = true;
+        got_notification = true;
+    }
+    
+    if (got_notification) {
         // Point to the next record to be written
         current_notification_index = (current_notification_index + 1) % HTTP_NT_BUFFER_SIZE_R;
 
@@ -345,4 +208,4 @@ void TIM8_BRK_IRQHandler(void) {
         // See https://www.twilio.com/docs/iot/microvisor/microvisor-notifications#buffer-overruns
         notification.event_type = 0;
     }
-}
+ }

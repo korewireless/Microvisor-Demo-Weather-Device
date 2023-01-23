@@ -30,7 +30,6 @@ void            http_channel_center_setup(void);
 bool            http_open_channel(void);
 void            http_close_channel(void);
 enum MvStatus   http_send_request(const char* url);
-void            http_process_response(void);
 
 
 #ifdef __cplusplus

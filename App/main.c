@@ -16,6 +16,7 @@ static void system_clock_config(void);
 static void GPIO_init(void);
 static void task_led(void *unused_arg);
 static void task_iot(void *unused_arg);
+static void process_http_response(void);
 static void log_device_info(void);
 
 
@@ -52,7 +53,8 @@ char forecast[48] = "None";
 volatile bool           use_i2c = false;
 volatile uint8_t        icon_code = 12;
 volatile bool           new_forecast = false;
-volatile bool           request_recv = false;
+volatile bool           received_request = false;
+volatile bool           channel_was_closed = false;
 
 static volatile bool    is_connected = false;
 static volatile bool    net_changed = false;
@@ -250,7 +252,7 @@ static void task_iot(void *unused_arg) {
     // Time trackers
     uint32_t read_tick = HAL_GetTick() - WEATHER_READ_PERIOD_MS;
     uint32_t kill_time = 0;
-    bool close_channel = false;
+    bool do_close_channel = false;
 
     // Run the thread's main loop
     while (1) {
@@ -262,7 +264,7 @@ static void task_iot(void *unused_arg) {
             if (http_handles.channel == 0) {
                 http_open_channel();
                 bool result = OW_request_forecast();
-                if (!result) close_channel = true;
+                if (!result) do_close_channel = true;
                 kill_time = tick;
             } else {
                 server_error("Channel handle not zero");
@@ -270,26 +272,181 @@ static void task_iot(void *unused_arg) {
         }
 
         // Process a request's response if indicated by the ISR
-        if (request_recv) http_process_response();
+        if (received_request) process_http_response();
 
+
+        // FROM 2.0.7
+        // Was the channel closed unexpectedly?
+        // `channel_was_closed` set in IRS
+        if (channel_was_closed) do_close_channel = true;
+        
         // Use 'kill_time' to force-close an open HTTP channel
         // if it's been left open too long
         if (kill_time > 0 && tick - kill_time > CHANNEL_KILL_PERIOD_MS) {
-            close_channel = true;
+            do_close_channel = true;
             server_error("HTTP request timed out");
         }
 
         // Close the channel if asked to do so or
         // a request yielded a response
-        if (close_channel || request_recv) {
-            close_channel = false;
-            request_recv = false;
+        if (do_close_channel || received_request) {
+            do_close_channel = false;
+            received_request = false;
             kill_time = 0;
             http_close_channel();
         }
 
         // End of cycle delay
         osDelay(10);
+    }
+}
+
+
+/**
+ * @brief Process HTTP response data.
+ */
+static void process_http_response(void) {
+    
+    // We have received data via the active HTTP channel so establish
+    // an `MvHttpResponseData` record to hold response metadata
+    struct MvHttpResponseData resp_data;
+    enum MvStatus status = mvReadHttpResponseData(http_handles.channel, &resp_data);
+    if (status == MV_STATUS_OKAY) {
+        // Check we successfully issued the request (`result` is OK) and
+        // the request was successful (status code 200)
+        if (resp_data.result == MV_HTTPRESULT_OK) {
+            if (resp_data.status_code == 200) {
+                server_log("HTTP response body length: %lu", resp_data.body_length);
+
+                // Set up a buffer that we'll get Microvisor
+                // to write the response body into
+                static uint8_t body_buffer[1500];
+                memset((void *)body_buffer, 0x00, 1500);
+                status = mvReadHttpResponseBody(http_handles.channel, 0, body_buffer, 1500);
+                if (status == MV_STATUS_OKAY) {
+                    uint32_t wid = 0;
+                    uint32_t code = NONE;
+                    double temp = 0.0;
+                    char cast[14] = "None";
+
+                    // Parse the incoming JSON using cJSON
+                    // (https://github.com/DaveGamble/cJSON)
+                    cJSON *json = cJSON_Parse((char *)body_buffer);
+                    if (json == NULL) {
+                        // Parsing failed -- log an error and bail
+                        const char *error_ptr = cJSON_GetErrorPtr();
+                        if (error_ptr != NULL) {
+                            server_error("Cant parse JSON, before %s", error_ptr);
+                        }
+                        cJSON_Delete(json);
+                        return;
+                    }
+
+                    // Extract current weather conditions from parsed JSON
+                    const cJSON *current = cJSON_GetObjectItemCaseSensitive(json, "current");
+                    const cJSON *weather = cJSON_GetObjectItemCaseSensitive(current, "weather");
+                    const cJSON *feels_like;
+
+                    if (weather != NULL) {
+                        cJSON *item = NULL;
+                        cJSON_ArrayForEach(item, weather) {
+                            // Get the info we're interested in
+                            const cJSON *icon = cJSON_GetObjectItemCaseSensitive(item, "icon");
+                            const cJSON *id = cJSON_GetObjectItemCaseSensitive(item, "id");
+                            const cJSON *main= cJSON_GetObjectItemCaseSensitive(item, "main");
+                            feels_like = cJSON_GetObjectItemCaseSensitive(current, "feels_like");
+
+                            // Set working values
+                            if (cJSON_IsNumber(id)) wid = (int)id->valuedouble;
+                            if (cJSON_IsString(main) && (main->valuestring != NULL)) {
+                                strcpy(cast, main->valuestring);
+                            }
+
+                            // Set standard icon values by weather condition
+                            if (strcmp(cast, "Rain") == 0) {
+                                code = RAIN;
+                            } else if (strcmp(cast, "Snow") == 0) {
+                                code = SNOW;
+                            } else if (strcmp(cast, "Thun") == 0) {
+                                code = THUNDERSTORM;
+                            }
+
+                            // Update icons and/or condition text for certain
+                            // quirky ID values
+                            if (wid == 771) {
+                                strcpy(cast, "Windy");
+                                code = WIND;
+                            }
+
+                            if (wid == 871) {
+                                strcpy(cast, "Tornado");
+                                code = TORNADO;
+                            }
+
+                            if (wid > 699 && wid < 770) {
+                                strcpy(cast, "Foggy");
+                                code = FOG;
+                            }
+
+                            if (strcmp(cast, "Clouds") == 0) {
+                                if (wid < 804) {
+                                    strcpy(cast, "Partly Cloudy");
+                                    code = PARTLY_CLOUDY;
+                                } else {
+                                    strcpy(cast, "Cloudy");
+                                    code = CLOUDY;
+                                }
+                            }
+
+                            if (wid > 602 && wid < 620) {
+                                strcpy(cast, "Sleet");
+                                code = SLEET;
+                            }
+
+                            if (strcmp(cast, "Drizzle") == 0) {
+                                code = DRIZZLE;
+                            }
+
+                            if (strcmp(cast, "Clear") == 0) {
+                                if (cJSON_IsString(icon) && (icon->valuestring != NULL)) {
+                                    if (icon->valuestring[2] == 'd') {
+                                        code = CLEAR_DAY;
+                                    } else {
+                                        code = CLEAR_NIGHT;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Did we get updated weather info?
+                    if (wid > 0) {
+                        // Yes! So update the forecast string, and tell the main loop
+                        // to refresh the display
+                        if (cJSON_IsNumber(feels_like)) {
+                            temp = feels_like->valuedouble;
+                        }
+
+                        sprintf(forecast, "    %s Out: %.1f", cast, temp);
+                        sprintf(&forecast[strlen(forecast)], "\x7F\x63\x20\x20\x20\x20");
+                        icon_code = code;
+                        new_forecast = true;
+                    }
+
+                    // Free the JSON parser
+                    cJSON_Delete(json);
+                    server_log("Forecast: %s (code: %lu) Feels Like %.1fc", cast, code, temp);
+                } else {
+                    server_error("HTTP response body read status %i", status);
+                }
+            } else {
+                server_error("HTTP status code: %lu", resp_data.status_code);
+            }
+        } else {
+            server_error("Request failed. Status: %i", resp_data.result);
+        }
+    } else {
+        server_error("Response data read failed. Status: %i", status);
     }
 }
 

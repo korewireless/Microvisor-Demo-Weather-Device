@@ -435,7 +435,7 @@ static void process_http_response(void) {
 
                     // Free the JSON parser
                     cJSON_Delete(json);
-                    server_log("Forecast: %s (code: %lu) Feels Like %.1fc", cast, code, temp);
+                    server_log("Forecast: %s (code: %lu) Feels Like %.1f°C", cast, code, temp);
                 } else {
                     server_error("HTTP response body read status %i", status);
                 }

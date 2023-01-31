@@ -94,7 +94,7 @@ void http_close_channel(void) {
         MvChannelHandle old = http_handles.channel;
         enum MvStatus status = mvCloseChannel(&http_handles.channel);
         do_assert((status == MV_STATUS_OKAY || status == MV_STATUS_CHANNELCLOSED), "Channel closure");
-        server_log("HTTP channel %lu closed", (uint32_t)old);
+        server_log("HTTP channel %lu closed (status code: %i)", (uint32_t)old, status);
     }
 
     // Confirm the channel handle has been invalidated by Microvisor

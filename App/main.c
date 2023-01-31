@@ -132,7 +132,7 @@ int main(void) {
 /**
  * @brief Get the MV clock value.
  *
- * @retval The clock value.
+ * @returns The clock value.
  */
 uint32_t SECURE_SystemCoreClockUpdate() {
     
@@ -243,7 +243,7 @@ static void task_led(void *unused_arg) {
 static void task_iot(void *unused_arg) {
     
     // Set up channel notifications
-    http_channel_center_setup();
+    http_notification_center_setup();
 
     // Configure OpenWeather
     // NOTE These values derived from env vars -- see README.md

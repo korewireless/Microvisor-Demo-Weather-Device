@@ -34,9 +34,9 @@ extern          char        forecast[32];
 
 
 /**
- *  @brief Open a new HTTP channel.
+ * @brief Open a new HTTP channel.
  *
- *  @retval `true` if the channel is open, otherwise `false`.
+ * @returns `true` if the channel is open, otherwise `false`.
  */
 bool http_open_channel(void) {
     
@@ -83,7 +83,7 @@ bool http_open_channel(void) {
 
 
 /**
- *  @brief Close the currently open HTTP channel.
+ * @brief Close the currently open HTTP channel.
  */
 void http_close_channel(void) {
     
@@ -105,7 +105,7 @@ void http_close_channel(void) {
 /**
  * @brief Configure the channel Notification Center.
  */
-void http_channel_center_setup(void) {
+void http_notification_center_setup(void) {
     
     // Clear the notification store
     memset((void *)http_notification_center, 0xFF, sizeof(http_notification_center));
@@ -132,7 +132,7 @@ void http_channel_center_setup(void) {
 /**
  * @brief Send a stock HTTP request.
  *
- * @retval `true` if the request was accepted by Microvisor, otherwise `false`
+ * @returns `true` if the request was accepted by Microvisor, otherwise `false`
  */
 enum MvStatus http_send_request(const char* url) {
     

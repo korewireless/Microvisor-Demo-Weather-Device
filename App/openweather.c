@@ -30,7 +30,7 @@ void OW_init(const char* api_key, double lat, double lng) {
 /**
  * @brief Issue an HTTP request to OpenWeather.
  *
- * @retval Whether the request was issued (`true`) or not (`false`)
+ * @returns Whether the request was issued (`true`) or not (`false`)
  */
 bool OW_request_forecast(void) {
     

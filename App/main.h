@@ -34,6 +34,7 @@
 #include "ht16k33-matrix.h"
 #include "i2c.h"
 #include "http.h"
+#include "network.h"
 #include "openweather.h"
 #include "cJSON.h"
 

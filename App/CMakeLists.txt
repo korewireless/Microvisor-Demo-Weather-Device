@@ -33,14 +33,15 @@ endif()
 
 # Compile app source code file(s)
 add_executable(${PROJECT_NAME}
-    main.c
     cJSON.c
     ht16k33-matrix.c
     http.c
     i2c.c
     logging.c
-    uart_logging.c
+    main.c
+    network.c
     openweather.c
+    uart_logging.c
     stm32u5xx_hal_timebase_tim_template.c
 )
 

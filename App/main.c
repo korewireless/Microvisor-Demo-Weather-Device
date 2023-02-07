@@ -82,6 +82,9 @@ int main(void) {
     
     // Get the Device ID and build number
     log_device_info();
+    
+    // Start the network
+    net_open_network();
 
     // Initialize the peripherals
     GPIO_init();

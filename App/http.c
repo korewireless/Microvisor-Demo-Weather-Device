@@ -106,7 +106,7 @@ void http_close_channel(void) {
 /**
  * @brief Configure the channel Notification Center.
  */
-void http_notification_center_setup(void) {
+void http_setup_notification_center(void) {
     
     // Clear the notification store
     memset((void *)http_notification_center, 0xFF, sizeof(http_notification_center));

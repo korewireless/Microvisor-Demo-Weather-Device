@@ -10,15 +10,11 @@ The application code files can be found in the [`App/`](App/) directory. The [`S
 
 ## Release Notes
 
-Version 3.0.0 requires Microvisor kernel 0.5.0 or above.
-
-Version 2.0.7 adds optional [logging over UART](#uart-logging).
-
-Version 2.0.6 adds [Docker support](#docker).
-
-Version 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
-
-Version 2.0.0 replaces earlier `printf()`-based application logging with Microvisor’s application logging system calls.
+* 3.0.0 requires Microvisor kernel 0.5.0 or above.
+* 2.0.7 adds optional [logging over UART](#uart-logging).
+* 2.0.6 adds [Docker support](#docker).
+* 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
+* 2.0.0 replaces earlier `printf()`-based application logging with Microvisor’s application logging system calls.
 
 ## Cloning the Repo
 

@@ -6,8 +6,8 @@
  * Licence: Apache 2.0
  *
  */
-#ifndef UART_LOGGING_H
-#define UART_LOGGING_H
+#ifndef _SHARED_H_
+#define _SHARED_H_
 
 
 #ifdef __cplusplus
@@ -18,15 +18,14 @@ extern "C" {
 /*
  * CONSTANTS
  */
-#define UART_LOG_TIMESTAMP_MAX_LEN_B        64
-#define UART_LOG_MESSAGE_MAX_LEN_B          64
+#define     SHARED_NC_BUFFER_SIZE_R         16
 
 
 /*
  * PROTOTYPES
  */
-bool    log_uart_init(void);
-void    log_uart_output(char* buffer);
+MvNotificationHandle    shared_get_handle(void);
+bool                    shared_setup_notification_center(void);
 
 
 #ifdef __cplusplus
@@ -34,4 +33,4 @@ void    log_uart_output(char* buffer);
 #endif
 
 
-#endif
+#endif      // _SHARED_H_

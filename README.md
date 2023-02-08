@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo 3.0.0
+# Twilio Microvisor Weather Device Demo 3.1.0
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -10,6 +10,7 @@ The application code files can be found in the [`App/`](App/) directory. The [`S
 
 ## Release Notes
 
+* 3.1.0 uses [Microvisor Secrets](#microvisor-secrets) to hold the OpenWeather API key.
 * 3.0.0 requires Microvisor kernel 0.5.0 or above.
 * 2.0.7 adds optional [logging over UART](#uart-logging).
 * 2.0.6 adds [Docker support](#docker).
@@ -147,10 +148,26 @@ twilio api:microvisor:v1:devices:list
 Before you build the app, set the following OpenWeather environment variables:
 
 ```bash
-export MVOW_API_KEY="<YOUR_OPEN_WEATHER_API_KEY>"
 export MVOW_LAT=<YOUR_LATITUDE_CO-ORDINATE>
 export MVOW_LNG=<YOUR_LONGITUDE_CO-ORDINATE>
 ```
+
+#### Microvisor Secrets
+
+Version 3.1.0 and above usee the Twilio cloud’s secrets store to hold your OpenWeather API key securely so it is not baked into the app itself. Set this up this way:
+
+Run:
+
+```shell
+curl -X POST https://microvisor.twilio.com/v1/Secrets \
+  -u ${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN} \
+  -d "Key=secret-ow-api-key" \
+  -d "Value=<YOUR_OW_API_KEY" | jq
+```
+
+This will upload the API key as a key-value pair. The pair’s key is `secret-ow-api-key`.
+
+The application uses this key to retrieve the API key from the cloud and hold it in RAM.
 
 ## Build the Deploy the Application
 

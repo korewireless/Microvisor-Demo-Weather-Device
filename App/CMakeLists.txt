@@ -34,6 +34,7 @@ endif()
 # Compile app source code file(s)
 add_executable(${PROJECT_NAME}
     cJSON.c
+    config.c
     ht16k33-matrix.c
     http.c
     i2c.c
@@ -41,8 +42,9 @@ add_executable(${PROJECT_NAME}
     main.c
     network.c
     openweather.c
-    uart_logging.c
+    shared.c
     stm32u5xx_hal_timebase_tim_template.c
+    uart_logging.c
 )
 
 # Link built libraries

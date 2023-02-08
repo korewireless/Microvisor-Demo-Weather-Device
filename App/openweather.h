@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.0.0
+ * Version 3.1.0
  * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
@@ -18,13 +18,14 @@ extern "C" {
 /*
  * CONSTANTS
  */
-#define FORECAST_BASE_URL "https://api.openweathermap.org/data/2.5/onecall"
+#define FORECAST_BASE_URL   "https://api.openweathermap.org/data/2.5/onecall"
+#define API_KEY_SECRET_NAME "secret-ow-api-key"
 
 
 /*
  * PROTOTYPES
  */
-void    OW_init(const char* api_key, double lat, double lng);
+void    OW_init(double lat, double lng);
 bool    OW_request_forecast(void);
 
 

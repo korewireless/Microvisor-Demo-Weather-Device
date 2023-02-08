@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.0.0
+ * Version 3.1.0
  * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
@@ -85,6 +85,7 @@ int main(void) {
     
     // Start the network
     net_open_network();
+    shared_setup_notification_center();
 
     // Initialize the peripherals
     GPIO_init();
@@ -245,12 +246,9 @@ static void task_led(void *unused_arg) {
  */
 static void task_iot(void *unused_arg) {
     
-    // Set up channel notifications
-    http_setup_notification_center();
-
     // Configure OpenWeather
     // NOTE These values derived from env vars -- see README.md
-    OW_init(API_KEY, LATITUDE, LONGITUDE);
+    OW_init(LATITUDE, LONGITUDE);
 
     // Time trackers
     uint32_t read_tick = HAL_GetTick() - WEATHER_READ_PERIOD_MS;

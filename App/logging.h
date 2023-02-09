@@ -34,9 +34,9 @@ extern "C" {
 /*
  * PROTOTYPES
  */
-void            server_log(char* format_string, ...);
-void            server_error(char* format_string, ...);
-void            do_assert(bool condition, char* message);
+void        server_log(char* format_string, ...);
+void        server_error(char* format_string, ...);
+void        do_assert(bool condition, char* message);
 
 
 #ifdef __cplusplus

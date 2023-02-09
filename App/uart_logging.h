@@ -18,15 +18,15 @@ extern "C" {
 /*
  * CONSTANTS
  */
-#define UART_LOG_TIMESTAMP_MAX_LEN_B        64
-#define UART_LOG_MESSAGE_MAX_LEN_B          64
+#define     UART_LOG_TIMESTAMP_MAX_LEN_B        64
+#define     UART_LOG_MESSAGE_MAX_LEN_B          64
 
 
 /*
  * PROTOTYPES
  */
-bool    log_uart_init(void);
-void    log_uart_output(char* buffer);
+bool log_uart_init(void);
+void log_uart_output(char* buffer);
 
 
 #ifdef __cplusplus

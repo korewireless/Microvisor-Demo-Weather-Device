@@ -18,7 +18,7 @@ extern "C" {
 /*
  * CONSTANTS
  */
-#define     SHARED_NC_BUFFER_SIZE_R         16
+#define                 SHARED_NC_BUFFER_SIZE_R                     16
 
 
 /*

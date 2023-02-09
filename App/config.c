@@ -59,6 +59,7 @@ bool config_get_secret(char *value_buffer, char key[]) {
     };
     
     // Request the value of the key specified above
+    server_log("Requesting value for key '%s'", key);
     enum MvStatus status = mvSendConfigFetchRequest(config_handles.channel, &request);
     if (status != MV_STATUS_OKAY) {
         server_error("Could not issue config fetch request");
@@ -80,6 +81,7 @@ bool config_get_secret(char *value_buffer, char key[]) {
     }
     
     // Parse the received data record
+    server_log("Received value for key '%s'", key);
     struct MvConfigResponseData response = {
         .result = 0,
         .num_items = 0

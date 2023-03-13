@@ -29,7 +29,8 @@ volatile bool received_config = false;
  * @param value_buffer - Whether the value will be written back to.
  * @param key          - The key name we're targeting.
  *
- * @returns `true` if the value was retrieved successfully
+ * @returns `true` if the value was retrieved successfully,
+ *          otherwise `false`
  */
 bool config_get_secret(char *value_buffer, char key[]) {
     
@@ -97,7 +98,7 @@ bool config_get_secret(char *value_buffer, char key[]) {
     uint8_t  value[65] = {0};
     uint32_t value_length = 0;
     enum MvConfigKeyFetchResult result = 0;
-    
+
     struct MvConfigResponseReadItemParams item = {
         .result = &result,
         .item_index = 0,
@@ -107,7 +108,7 @@ bool config_get_secret(char *value_buffer, char key[]) {
             .length = &value_length
         }
     };
-    
+
     // Get the value itself
     status = mvReadConfigResponseItem(config_handles.channel, &item);
     if (status != MV_STATUS_OKAY || result != MV_CONFIGKEYFETCHRESULT_OK) {
@@ -115,7 +116,7 @@ bool config_get_secret(char *value_buffer, char key[]) {
         config_close_channel();
         return false;
     }
-    
+
     // Copy the value data to the requested location
     strncpy(value_buffer, (char*)value, value_length + 1);
     config_close_channel();

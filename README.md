@@ -10,7 +10,7 @@ The application code files can be found in the [`App/`](App/) directory. The [`S
 
 ## Release Notes
 
-* 3.0.0 requires Microvisor kernel 0.5.0 or above.
+* 3.0.0 requires Microvisor kernel 0.5.0 or above, and [Twilio CLI Microvisor Plugin 0.3.10](https://www.twilio.com/docs/iot/microvisor/the-twilio-cli-microvisor-plugin) or above.
 * 2.0.7 adds optional [logging over UART](#uart-logging).
 * 2.0.6 adds [Docker support](#docker).
 * 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
@@ -157,7 +157,7 @@ export MVOW_LNG=<YOUR_LONGITUDE_CO-ORDINATE>
 Run:
 
 ```bash
-./deploy.sh --log
+twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} --log
 ```
 
 This will compile, bundle and upload the code, and stage it for deployment to your device. If you encounter errors, please check your stored Twilio credentials.
@@ -169,13 +169,13 @@ The `--log` flag initiates log-streaming.
 You can start log streaming separately — for example, in a second terminal window — with this command:
 
 ```bash
-./deploy.sh --log-only
+twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} --log-only
 ```
 
 For more information, run
 
 ```bash
-./deploy.sh --help
+twilio microvisor:deploy --help
 ```
 
 ## UART Logging

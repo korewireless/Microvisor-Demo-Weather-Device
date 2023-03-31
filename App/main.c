@@ -95,7 +95,7 @@ int main(void) {
     if (use_i2c) {
         HT16K33_init(2);
         char* title = malloc(42);
-        sprintf(title, "    %s %s (%02i)    ", APP_NAME, APP_VERSION, BUILD_NUM);
+        sprintf(title, "    %s %s    ", APP_NAME, APP_VERSION);
         HT16K33_print(title, 75);
         free(title);
 
@@ -461,7 +461,6 @@ static void log_device_info(void) {
     mvGetDeviceId(buffer, 34);
     server_log("Device: %s", buffer);
     server_log("   App: %s %s", APP_NAME, APP_VERSION);
-    server_log(" Build: %i", BUILD_NUM);
 }
 
 

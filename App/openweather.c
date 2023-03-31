@@ -10,6 +10,12 @@
 
 
 /*
+ * STATIC PROTOTYPES
+ */
+static bool OW_get_key(void);
+
+
+/*
  * GLOBALS
  */
 static char request_url[1024] = { 0 };
@@ -24,11 +30,14 @@ static bool got_key = false;
 void OW_init(double lat, double lng) {
     
     // Request the 'secret' API key
-    if (config_get_secret(api_key, API_KEY_SECRET_NAME)) {
-        // Create the access URL using sprintf()
-        sprintf(request_url, "%s?lat=%.6f&lon=%.6f&appid=%s&exclude=minutely,hourly,daily,alerts&units=metric", FORECAST_BASE_URL, lat, lng, api_key);
-        got_key = true;
-    }
+    if (!got_key) got_key = config_get_secret(api_key, API_KEY_SECRET_NAME);
+    
+    if (got_key) sprintf(request_url,
+                         "%s?lat=%.6f&lon=%.6f&appid=%s&exclude=minutely,hourly,daily,alerts&units=metric",
+                         FORECAST_BASE_URL,
+                         lat,
+                         lng,
+                         api_key);
 }
 
 
@@ -39,7 +48,18 @@ void OW_init(double lat, double lng) {
  */
 bool OW_request_forecast(void) {
     
-    if (!got_key) return false;
-    return (http_send_request(request_url) == MV_STATUS_OKAY);
+    if (!got_key) got_key = OW_get_key();
+    if (got_key)  return (http_send_request(request_url) == MV_STATUS_OKAY);
+    return false;
 }
 
+
+/**
+ * @brief Request the API key.
+ *
+ * @returns Whether the key was received (`true`) or not (`false`)
+ */
+static bool OW_get_key(void) {
+    
+    return config_get_secret(api_key, API_KEY_SECRET_NAME);
+}

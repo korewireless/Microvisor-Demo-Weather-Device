@@ -4,14 +4,14 @@ This repo provides a basic demonstration of a sample weather monitor application
 
 The application is based on the [FreeRTOS](https://freertos.org/) real-time operating system and which will run on the “non-secure” side of Microvisor. FreeRTOS is included as a submodule.
 
-The [ARM CMSIS-RTOS API](https://github.com/ARM-software/CMSIS_5) is used an an intermediary between the application and FreeRTOS to make it easier to swap out the RTOS layer for another.
+The [ARM CMSIS-RTOS API](https://github.com/ARM-software/CMSIS_5) is used an an intermediary between the application and FreeRTOS to make it easier to swap out the RTOS layer for another should you wish to do so.
 
 The application code files can be found in the [`App/`](App/) directory. The [`ST_Code/`](ST_Code/) directory contains required components that are not part of Twilio Microvisor STM32U5 HAL, which this sample code accesses as a submodule. The required `FreeRTOSConfig.h` and `stm32u5xx_hal_conf.h` configuration files are located in the [config/](config/) directory.
 
 ## Release Notes
 
 * 3.1.0 uses [Microvisor Secrets](#microvisor-secrets) to hold the OpenWeather API key.
-* 3.0.0 requires Microvisor kernel 0.5.0 or above.
+* 3.0.0 requires Microvisor kernel 0.5.0 or above, and [Twilio CLI Microvisor Plugin 0.3.10](https://www.twilio.com/docs/iot/microvisor/the-twilio-cli-microvisor-plugin) or above.
 * 2.0.7 adds optional [logging over UART](#uart-logging).
 * 2.0.6 adds [Docker support](#docker).
 * 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
@@ -129,7 +129,7 @@ twilio plugins:install @twilio/plugin-microvisor
 
 #### Environment Variables
 
-Running the Twilio CLI and the project's [deploy script](./deploy.sh) — for uploading the built code to the Twilio cloud and subsequent deployment to your Microvisor Nucleo Board — uses the following Twilio credentials stored as environment variables. They should be added to your shell profile:
+Running the Twilio CLI and the Microvisor Plugin to upload the built code to the Twilio cloud for subsequent deployment to your Microvisor Nucleo Board uses the following Twilio credentials stored as environment variables. They should be added to your shell profile:
 
 ```bash
 export TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -174,7 +174,7 @@ The application uses this key to retrieve the API key from the cloud and hold it
 Run:
 
 ```bash
-./deploy.sh --log
+twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} --log
 ```
 
 This will compile, bundle and upload the code, and stage it for deployment to your device. If you encounter errors, please check your stored Twilio credentials.
@@ -186,13 +186,13 @@ The `--log` flag initiates log-streaming.
 You can start log streaming separately — for example, in a second terminal window — with this command:
 
 ```bash
-./deploy.sh --log-only
+twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} --log-only
 ```
 
 For more information, run
 
 ```bash
-./deploy.sh --help
+twilio microvisor:deploy --help
 ```
 
 ## UART Logging
@@ -220,7 +220,9 @@ Remote debugging sessions are now encrypted. The file `app/CMakeLists.txt` gener
 Alternatively, generate the keys manually and pass their locations to the deploy script:
 
 ```shell
-./deploy.sh --private-key /path/to/private/key.pem --public-key /path/to/public/key.pem
+twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} \
+   --privatekey /path/to/private/key.pem \
+   --publickey /path/to/public/key.pem
 ```
 
 ## Copyright and Licensing

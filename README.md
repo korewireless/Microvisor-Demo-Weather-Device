@@ -11,7 +11,7 @@ The application code files can be found in the [`App/`](App/) directory. The [`S
 ## Release Notes
 
 * 3.1.0 uses [Microvisor Secrets](#microvisor-secrets) to hold the OpenWeather API key.
-* 3.0.0 requires Microvisor kernel 0.5.0 or above, and [Twilio CLI Microvisor Plugin 0.3.10](https://www.twilio.com/docs/iot/microvisor/the-twilio-cli-microvisor-plugin) or above.
+* 3.0.0 requires Microvisor kernel 0.5.1 or above, and [Twilio CLI Microvisor Plugin 0.3.10](https://www.twilio.com/docs/iot/microvisor/the-twilio-cli-microvisor-plugin) or above.
 * 2.0.7 adds optional [logging over UART](#uart-logging).
 * 2.0.6 adds [Docker support](#docker).
 * 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
@@ -165,9 +165,11 @@ curl -X POST https://microvisor.twilio.com/v1/Secrets \
   -d "Value=<YOUR_OW_API_KEY" | jq
 ```
 
-This will upload the API key as a key-value pair. The pair’s key is `secret-ow-api-key`.
+This will upload the API key as a key-value pair. The pair’s key is `secret-ow-api-key`. If you change this value, make sure to change the value of the `#define API_KEY_SECRET_NAME` in `openweather.h`.
 
 The application uses this key to retrieve the API key from the cloud and hold it in RAM.
+
+It is left as an exercise for the reader to update the application to load the device’s latitude and longitude using this method rather than local enviroment variables.
 
 ## Build the Deploy the Application
 
@@ -215,14 +217,14 @@ This repo contains a `.gdbinit` file which sets the remote target to localhost o
 
 #### Remote Debugging Encryption
 
-Remote debugging sessions are now encrypted. The file `app/CMakeLists.txt` generates new remote debugging keys at each build. These are placed in the `/build/app` directory, which is ignored for git commits. You will need to pass the path to the private key to the Twilio CLI Microvisor plugin to decrypt debugging data. The deploy script will output this path for you.
+Remote debugging sessions are now encrypted. The file `app/CMakeLists.txt` generates new remote debugging keys at each build. These are placed in the `/build/app` directory, which is ignored for git commits. You will need to pass the path to the private key to the Twilio CLI Microvisor plugin to decrypt debugging data. The plugin will output this path for you.
 
 Alternatively, generate the keys manually and pass their locations to the deploy script:
 
 ```shell
 twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} \
-   --privatekey /path/to/private/key.pem \
-   --publickey /path/to/public/key.pem
+   --privatekey /path/to/existing/private/key.pem \
+   --publickey /path/to/existing/public/key.pem
 ```
 
 ## Copyright and Licensing

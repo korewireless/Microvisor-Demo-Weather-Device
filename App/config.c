@@ -95,7 +95,7 @@ bool config_get_secret(char *value_buffer, char key[]) {
         return false;
     }
     
-    uint8_t  value[65] = {0};
+    uint8_t value[65] = {0};
     uint32_t value_length = 0;
     enum MvConfigKeyFetchResult result = 0;
 

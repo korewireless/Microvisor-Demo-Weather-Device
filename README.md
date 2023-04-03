@@ -11,7 +11,7 @@ The application code files can be found in the [`App/`](App/) directory. The [`S
 ## Release Notes
 
 * 3.1.0 uses [Microvisor Secrets](#microvisor-secrets) to hold the OpenWeather API key.
-* 3.0.0 requires Microvisor kernel 0.5.1 or above, and [Twilio CLI Microvisor Plugin 0.3.10](https://www.twilio.com/docs/iot/microvisor/the-twilio-cli-microvisor-plugin) or above.
+* 3.0.0 requires Microvisor kernel 0.5.1 or above, Twilio CLI 5.5.0 or above, and [Twilio CLI Microvisor Plugin 0.3.10](https://www.twilio.com/docs/iot/microvisor/the-twilio-cli-microvisor-plugin) or above.
 * 2.0.7 adds optional [logging over UART](#uart-logging).
 * 2.0.6 adds [Docker support](#docker).
 * 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
@@ -154,22 +154,19 @@ export MVOW_LNG=<YOUR_LONGITUDE_CO-ORDINATE>
 
 #### Microvisor Secrets
 
-Version 3.1.0 and above usee the Twilio cloud’s secrets store to hold your OpenWeather API key securely so it is not baked into the app itself. Set this up this way:
+Version 3.1.0 and above uses the Twilio cloud’s secrets store to hold your OpenWeather API key securely so it is not baked into the app itself. Set this up this way:
 
 Run:
 
 ```shell
-curl -X POST https://microvisor.twilio.com/v1/Secrets \
-  -u ${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN} \
-  -d "Key=secret-ow-api-key" \
-  -d "Value=<YOUR_OW_API_KEY" | jq
+twilio api:microvisor:v1:secrets:create --key secret-ow-api-key --value <YOUR_OW_API_KEY>
 ```
 
 This will upload the API key as a key-value pair. The pair’s key is `secret-ow-api-key`. If you change this value, make sure to change the value of the `#define API_KEY_SECRET_NAME` in `openweather.h`.
 
 The application uses this key to retrieve the API key from the cloud and hold it in RAM.
 
-It is left as an exercise for the reader to update the application to load the device’s latitude and longitude using this method rather than local enviroment variables.
+It is left as an exercise for the reader to update the application to load the device’s latitude and longitude using this method rather than local environment variables.
 
 ## Build the Deploy the Application
 

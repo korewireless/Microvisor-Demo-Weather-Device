@@ -62,7 +62,7 @@ Assemble the following circuit:
 
 ![The Microvisor IOT device demo circuit](./images/circuit.png)
 
-The display are shown on breakout boards which include I2C pull-up resistors. If you add the display and sensor as raw components, you will need to add pull-ups on the I2C SDA and SCL lines. You only need a single pull-up on each line.
+The display is shown on a breakout board which include I&sup2;C pull-up resistors. If you add the display and sensor as raw components, you will need to add pull-ups on the I&sup2;C SDA and SCL lines. You only need a single pull-up on each line.
 
 ## Software Setup
 

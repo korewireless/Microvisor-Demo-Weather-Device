@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: Build docker image
@@ -19,7 +19,7 @@ jobs:
     - name: Build code
       run: docker run --rm -v $(pwd)/:/home/mvisor/project/ --env MICROVISOR_GITHUB_ACTION_WEATHER_TEST=true --name microvisor-weather microvisor-weather-image
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: mv-weather-device-demo
         path: ${{ github.workspace }}/build/App/mv-weather-device-demo.*

@@ -5,7 +5,7 @@ cd $(dirname $0)
 
 [ -d build ] && rm -rf build
 
-if [[ -n "${MICROVISOR_GITHUB_ACTION_FLOW_WEATHER_TEST}" ]]; then
+if [[ -n "${MICROVISOR_GITHUB_ACTION_WEATHER_TEST}" ]]; then
   # Build only
   twilio microvisor:deploy . -b
 else

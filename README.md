@@ -216,7 +216,7 @@ This repo contains a `.gdbinit` file which sets the remote target to localhost o
 
 Remote debugging sessions are now encrypted. The file `app/CMakeLists.txt` generates new remote debugging keys at each build. These are placed in the `/build/app` directory, which is ignored for git commits. You will need to pass the path to the private key to the Twilio CLI Microvisor plugin to decrypt debugging data. The plugin will output this path for you.
 
-Alternatively, generate the keys manually and pass their locations to the deploy script:
+Alternatively, generate the keys manually and pass their locations to the plugin:
 
 ```shell
 twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} \

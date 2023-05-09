@@ -39,7 +39,6 @@
 #include "cJSON.h"
 #include "config.h"
 #include "shared.h"
-#include "app_version.h"
 
 
 #ifdef __cplusplus

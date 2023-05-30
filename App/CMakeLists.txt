@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 # Set application data
 set(APP "Microvisor Weather Demo")
-set(VERSION_NUMBER "3.1.1")
+set(VERSION_NUMBER "3.1.2")
 set(BUILD_NUMBER "0")
 
 message("Building ${APP} ${VERSION_NUMBER}")
@@ -11,10 +11,6 @@ message("Building ${APP} ${VERSION_NUMBER}")
 # Pass in version data
 configure_file(app_version.in app_version.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-# Make app data available to the compiler
-# add_compile_definitions(APP_NAME="${APP}")
-# add_compile_definitions(APP_VERSION="${VERSION_NUMBER}")
 
 # Load in and use project env vars
 if(DEFINED ENV{MVOW_LAT})

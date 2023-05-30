@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.1
+ * Version 3.1.2
  * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *

@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.1
+ * Version 3.1.2
  * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
@@ -50,7 +50,6 @@ bool http_open_channel(void) {
     // Set up shared notification center
     http_handles.notification = shared_get_handle();
     if (http_handles.notification == 0) return false;
-    server_log("Shared NC handle: %lu", (uint32_t)http_handles.notification);
     
     // Configure the required data channel
     struct MvOpenChannelParams channel_config = {

@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.1
+ * Version 3.1.2
  * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
@@ -29,7 +29,7 @@ static void log_device_info(void);
 static osThreadId_t thread_led;
 static const osThreadAttr_t led_task_attributes = {
     .name = "LEDTask",
-    .stack_size = 2560,
+    .stack_size = 5120,
     .priority = (osPriority_t)osPriorityNormal
 };
 
@@ -95,10 +95,6 @@ int main(void) {
     // Set up the display if it's available
     if (use_i2c) {
         HT16K33_init(2);
-        char* title = malloc(42);
-        sprintf(title, "    %s %s    ", APP_NAME, APP_VERSION);
-        HT16K33_print(title, 75);
-        free(title);
 
         // Set the weather icons
         HT16K33_define_character("\x91\x42\x18\x3d\xbc\x18\x42\x89", CLEAR_DAY);
@@ -114,6 +110,11 @@ int main(void) {
         HT16K33_define_character("\x00\x40\x6C\xBE\xBB\xB1\x60\x40", TORNADO);
         HT16K33_define_character("\x3C\x42\x81\xC3\xFF\xFF\x7E\x3C", CLEAR_NIGHT);
         HT16K33_define_character("\x00\x00\x40\x9D\x90\x60\x00\x00", NONE);
+
+        char* title = malloc(42);
+        sprintf(title, "    %s %s    ", APP_NAME, APP_VERSION);
+        HT16K33_print(title, 75);
+        free(title);
     }
 
     // Init scheduler

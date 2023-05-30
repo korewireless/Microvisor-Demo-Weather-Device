@@ -1,7 +1,7 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.1
+ * Version 3.1.2
  * Copyright © 2023, Twilio
  * Licence: Apache 2.0
  *
@@ -146,7 +146,6 @@ bool config_open_channel(void) {
     // Set up shared notification center
     config_handles.notification = shared_get_handle();
     if (config_handles.notification == 0) return false;
-    server_log("Shared NC handle: %lu", (uint32_t)config_handles.notification);
     
     // Get the network channel handle.
     // NOTE This is set in `logging.c` which puts the network in place
@@ -195,7 +194,7 @@ void config_close_channel(void) {
         MvChannelHandle old = config_handles.channel;
         enum MvStatus status = mvCloseChannel(&config_handles.channel);
         do_assert((status == MV_STATUS_OKAY || status == MV_STATUS_CHANNELCLOSED), "Channel closure");
-        server_log("Shared channel %lu closed (status code: %i)", (uint32_t)old, status);
+        server_log("Config channel %lu closed (status code: %i)", (uint32_t)old, status);
     }
 
     // Confirm the channel handle has been invalidated by Microvisor

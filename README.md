@@ -1,4 +1,4 @@
-# Twilio Microvisor Weather Device Demo 3.1.1
+# Microvisor Weather Device Demo 3.2.0
 
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
@@ -6,7 +6,7 @@ The application is based on the [FreeRTOS](https://freertos.org/) real-time oper
 
 The [ARM CMSIS-RTOS API](https://github.com/ARM-software/CMSIS_5) is used an an intermediary between the application and FreeRTOS to make it easier to swap out the RTOS layer for another should you wish to do so.
 
-The application code files can be found in the [`App/`](App/) directory. The [`ST_Code/`](ST_Code/) directory contains required components that are not part of Twilio Microvisor STM32U5 HAL, which this sample code accesses as a submodule. The required `FreeRTOSConfig.h` and `stm32u5xx_hal_conf.h` configuration files are located in the [config/](config/) directory.
+The application code files can be found in the [`App/`](App/) directory. The [`ST_Code/`](ST_Code/) directory contains required components that are not part of the icrovisor STM32U5 HAL, which this sample code accesses as a submodule. The required `FreeRTOSConfig.h` and `stm32u5xx_hal_conf.h` configuration files are located in the [config/](config/) directory.
 
 ## Release Notes
 
@@ -22,13 +22,13 @@ The application code files can be found in the [`App/`](App/) directory. The [`S
 This repo makes uses of git submodules, some of which are nested within other submodules. To clone the repo, run:
 
 ```bash
-git clone https://github.com/TwilioDevEd/microvisor-weather-device-demo.git
+git clone https://github.com/korewireless/Microvisor-Demo-Weather-Device.git
 ```
 
 and then:
 
 ```bash
-cd microvisor-weather-device-demo
+cd Microvisor-Demo-Weather-Device
 git submodule update --init --recursive
 ```
 
@@ -52,7 +52,7 @@ Get your location — or any location co-ordinates — from [Google Maps](https:
 
 You will also need the following hardware:
 
-* A Twilio Microvisor Nucleo Development Board. You will need to solder male header pins to the two GPIO banks on the board, or at the very least to the connected pins shown in the circuit diagram below.
+* A Microvisor Nucleo Development Board. You will need to solder male header pins to the two GPIO banks on the board, or at the very least to the connected pins shown in the circuit diagram below.
 * An HT16K33-based 8x8 matrix display, e.g., [Adafruit 1.2-inch 8x8 LED Matrix and Backpack](https://www.adafruit.com/product/1856).
 * Four female-to-female jumper wires.
 
@@ -129,7 +129,7 @@ twilio plugins:install @twilio/plugin-microvisor
 
 #### Environment Variables
 
-Running the Twilio CLI and the Microvisor Plugin to upload the built code to the Twilio cloud for subsequent deployment to your Microvisor Nucleo Board uses the following Twilio credentials stored as environment variables. They should be added to your shell profile:
+Running the Twilio CLI and the Microvisor Plugin to upload the built code to the Microvisor cloud for subsequent deployment to your Microvisor Nucleo Board uses the following Twilio credentials stored as environment variables. They should be added to your shell profile:
 
 ```bash
 export TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -154,7 +154,7 @@ export MVOW_LNG=<YOUR_LONGITUDE_CO-ORDINATE>
 
 #### Microvisor Secrets
 
-Version 3.1.0 and above uses the Twilio cloud’s secrets store to hold your OpenWeather API key securely so it is not baked into the app itself. Set this up this way:
+Version 3.1.0 and above uses the Microvisor cloud’s secrets store to hold your OpenWeather API key securely so it is not baked into the app itself. Set this up this way:
 
 Run:
 
@@ -226,7 +226,7 @@ twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} \
 
 ## Copyright and Licensing
 
-The sample code and Microvisor SDK is © 2023, Twilio, Inc. It is licensed under the terms of the [Apache 2.0 License](./LICENSE).
+The sample code and Microvisor SDK is © 2023, KORE Wireless. It is licensed under the terms of the [MIT License](./LICENSE.md).
 
 The SDK makes use of code © 2021, STMicroelectronics and affiliates. This code is licensed under terms described in [this file](https://github.com/twilio/twilio-microvisor-hal-stm32u5/blob/main/LICENSE-STM32CubeU5.md).
 

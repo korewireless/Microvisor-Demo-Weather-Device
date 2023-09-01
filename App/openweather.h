@@ -1,18 +1,13 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.2
- * Copyright © 2023, Twilio
- * Licence: Apache 2.0
+ *
+ * Copyright © 2023, KORE Wireless
+ * Licence: MIT
  *
  */
 #ifndef OPENWEATHER_H
 #define OPENWEATHER_H
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 /*
@@ -35,6 +30,11 @@ extern "C" {
 #define     TORNADO                     10
 #define     CLEAR_NIGHT                 11
 #define     NONE                        12
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*

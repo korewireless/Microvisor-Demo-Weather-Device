@@ -1,18 +1,13 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.2
- * Copyright © 2023, Twilio
- * Licence: Apache 2.0
+ *
+ * Copyright © 2023, KORE Wireless
+ * Licence: MIT
  *
  */
 #ifndef _HT16K33_MATRIX_HEADER_
 #define _HT16K33_MATRIX_HEADER_
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 /*
@@ -22,6 +17,11 @@ extern "C" {
 #define     HT16K33_CMD_POWER_ON            0x21
 #define     HT16K33_CMD_DISPLAY_ON          0x81
 #define     HT16K33_CMD_BRIGHTNESS          0xE0
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*

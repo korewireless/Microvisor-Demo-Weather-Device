@@ -1,9 +1,9 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.2
- * Copyright © 2023, Twilio
- * Licence: Apache 2.0
+ *
+ * Copyright © 2023, KORE Wireless
+ * Licence: MIT
  *
  */
 #include "main.h"
@@ -147,7 +147,7 @@ enum MvStatus http_send_request(const char* url) {
     // Issue the request -- and check its status
     enum MvStatus status = mvSendHttpRequest(http_handles.channel, &request_config);
     if (status == MV_STATUS_OKAY) {
-        server_log("Request sent to Twilio");
+        server_log("Request sent to the Microvisor Cloud");
     } else if (status == MV_STATUS_CHANNELCLOSED) {
         server_error("HTTP channel %lu already closed", (uint32_t)http_handles.channel);
     } else {

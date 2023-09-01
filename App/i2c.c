@@ -1,9 +1,9 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.2
- * Copyright © 2023, Twilio
- * Licence: Apache 2.0
+ *
+ * Copyright © 2023, KORE Wireless
+ * Licence: MIT
  *
  */
 #include "main.h"

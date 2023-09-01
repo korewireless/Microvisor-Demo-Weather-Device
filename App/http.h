@@ -1,18 +1,13 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.2
- * Copyright © 2023, Twilio
- * Licence: Apache 2.0
+ *
+ * Copyright © 2023, KORE Wireless
+ * Licence: MIT
  *
  */
 #ifndef _HTTP_H_
 #define _HTTP_H_
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 /*
@@ -22,6 +17,11 @@ extern "C" {
 #define         HTTP_RX_BUFFER_SIZE_B           2560
 #define         HTTP_TX_BUFFER_SIZE_B           512
 #define         HTTP_NC_BUFFER_SIZE_R           8       // NOTE Size in records, not bytes
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*

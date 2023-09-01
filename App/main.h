@@ -1,9 +1,9 @@
 /**
  *
  * Microvisor Weather Device Demo
- * Version 3.1.2
- * Copyright © 2023, Twilio
- * Licence: Apache 2.0
+ *
+ * Copyright © 2023, KORE Wireless
+ * Licence: MIT
  *
  */
 #ifndef _MAIN_H_
@@ -41,11 +41,6 @@
 #include "shared.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 /*
  * CONSTANTS
  */
@@ -60,6 +55,11 @@ extern "C" {
 
 #define     WEATHER_READ_PERIOD_MS      300000
 #define     CHANNEL_KILL_PERIOD_MS      15000
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*

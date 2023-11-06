@@ -8,15 +8,6 @@ The [ARM CMSIS-RTOS API](https://github.com/ARM-software/CMSIS_5) is used an an 
 
 The application code files can be found in the [`App/`](App/) directory. The [`ST_Code/`](ST_Code/) directory contains required components that are not part of the icrovisor STM32U5 HAL, which this sample code accesses as a submodule. The required `FreeRTOSConfig.h` and `stm32u5xx_hal_conf.h` configuration files are located in the [config/](config/) directory.
 
-## Release Notes
-
-* 3.1.0 uses [Microvisor Secrets](#microvisor-secrets) to hold the OpenWeather API key.
-* 3.0.0 requires Microvisor kernel 0.5.1 or above, Twilio CLI 5.5.0 or above, and [Twilio CLI Microvisor Plugin 0.3.10](https://www.twilio.com/docs/iot/microvisor/the-twilio-cli-microvisor-plugin) or above.
-* 2.0.7 adds optional [logging over UART](#uart-logging).
-* 2.0.6 adds [Docker support](#docker).
-* 2.0.5 has no code changes, but adds Visual Studio Code remote debugging support.
-* 2.0.0 replaces earlier `printf()`-based application logging with Microvisor’s application logging system calls.
-
 ## Cloning the Repo
 
 This repo makes uses of git submodules, some of which are nested within other submodules. To clone the repo, run:
@@ -154,7 +145,7 @@ export MVOW_LNG=<YOUR_LONGITUDE_CO-ORDINATE>
 
 #### Microvisor Secrets
 
-Version 3.1.0 and above uses the Microvisor cloud’s secrets store to hold your OpenWeather API key securely so it is not baked into the app itself. Set this up this way:
+We now use the Microvisor cloud’s secrets store to hold your OpenWeather API key securely so it is not baked into the app itself. Set this up this way:
 
 Run:
 

@@ -33,13 +33,13 @@ volatile bool received_config = false;
  *          otherwise `false`
  */
 bool config_get_secret(char *value_buffer, char key[]) {
-    
+
     // Check for a valid channel handle
     if (config_handles.channel == 0) {
         // There's no open channel, so open open one now
         if (!config_open_channel()) return false;
     }
-    
+
     // Set up the request parameters
     struct MvConfigKeyToFetch key_one = {
         .scope = MV_CONFIGKEYFETCHSCOPE_ACCOUNT,    // An account-level value
@@ -49,16 +49,16 @@ bool config_get_secret(char *value_buffer, char key[]) {
             .length = strlen(key)
         }
     };
-    
+
     uint32_t item_count = 1;
     struct MvConfigKeyToFetch keys[item_count];
     keys[0] = key_one;
-    
+
     struct MvConfigKeyFetchParams request = {
         .num_items = item_count,
         .keys_to_fetch = keys
     };
-    
+
     // Request the value of the key specified above
     server_log("Requesting value for key '%s'", key);
     enum MvStatus status = mvSendConfigFetchRequest(config_handles.channel, &request);
@@ -67,34 +67,35 @@ bool config_get_secret(char *value_buffer, char key[]) {
         config_close_channel();
         return false;
     }
-    
+
     // Wait for the data to arrive
     received_config = false;
     uint32_t last_tick = HAL_GetTick();
     while(HAL_GetTick() - last_tick < CONFIG_WAIT_PERIOD_MS) {
         if (received_config) break;
+        __asm("nop");
     }
-    
+
     if (!received_config) {
         server_error("Config fetch request timed out");
         config_close_channel();
         return false;
     }
-    
+
     // Parse the received data record
     server_log("Received value for key '%s'", key);
     struct MvConfigResponseData response = {
         .result = 0,
         .num_items = 0
     };
-    
+
     status = mvReadConfigFetchResponseData(config_handles.channel, &response);
     if (status != MV_STATUS_OKAY || response.result != MV_CONFIGFETCHRESULT_OK || response.num_items != item_count) {
         server_error("Could not get config item (status: %i; result: %i)", status, response.result);
         config_close_channel();
         return false;
     }
-    
+
     uint8_t value[65] = {0};
     uint32_t value_length = 0;
     enum MvConfigKeyFetchResult result = 0;
@@ -130,11 +131,11 @@ bool config_get_secret(char *value_buffer, char key[]) {
  * @returns `true` if the channel is open, otherwise `false`.
  */
 bool config_open_channel(void) {
-    
+
     // Set up the HTTP channel's multi-use send and receive buffers
     static volatile uint8_t config_rx_buffer[CONFIG_RX_BUFFER_SIZE_B] __attribute__((aligned(512)));
     static volatile uint8_t config_tx_buffer[CONFIG_RX_BUFFER_SIZE_B] __attribute__((aligned(512)));
-    
+
     // Get the network channel handle.
     // NOTE This is set in `logging.c` which puts the network in place
     //      (ie. so the network handle != 0) well in advance of this being called
@@ -146,7 +147,7 @@ bool config_open_channel(void) {
     // Set up shared notification center
     config_handles.notification = shared_get_handle();
     if (config_handles.notification == 0) return false;
-    
+
     // Get the network channel handle.
     // NOTE This is set in `logging.c` which puts the network in place
     //      (ie. so the network handle != 0) well in advance of this being called
@@ -176,7 +177,7 @@ bool config_open_channel(void) {
         server_log("Config channel handle: %lu", (uint32_t)config_handles.channel);
         return true;
     }
-    
+
     server_error("Could not open config channel. Status: %i", status);
     return false;
 }
@@ -186,7 +187,7 @@ bool config_open_channel(void) {
  * @brief Close the currently open HTTP channel.
  */
 void config_close_channel(void) {
-    
+
     // If we have a valid channel handle -- ie. it is non-zero --
     // then ask Microvisor to close it and confirm acceptance of
     // the closure request.

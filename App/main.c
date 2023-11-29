@@ -74,16 +74,16 @@ extern struct {
  * @brief The application entry point.
  */
 int main(void) {
-    
+
     // Reset of all peripherals, Initializes the Flash interface and the Systick.
     HAL_Init();
 
     // Configure the system clock
     system_clock_config();
-    
+
     // Get the Device ID and build number
     log_device_info();
-    
+
     // Start the network
     net_open_network();
     shared_setup_notification_center();
@@ -141,7 +141,7 @@ int main(void) {
  * @returns The clock value.
  */
 uint32_t SECURE_SystemCoreClockUpdate() {
-    
+
     uint32_t clock = 0;
     mvGetHClk(&clock);
     return clock;
@@ -152,7 +152,7 @@ uint32_t SECURE_SystemCoreClockUpdate() {
  * @brief System clock configuration.
  */
 static void system_clock_config(void) {
-    
+
     SystemCoreClockUpdate();
     HAL_InitTick(TICK_INT_PRIORITY);
 }
@@ -164,7 +164,7 @@ static void system_clock_config(void) {
  * Used to flash the Nucleo's USER LED, which is on GPIO Pin PA5.
  */
 static void GPIO_init(void) {
-    
+
     // Enable GPIO port clock
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
@@ -187,7 +187,7 @@ static void GPIO_init(void) {
  * @param *unused_arg: Not used.
  */
 static void task_led(void *unused_arg) {
-    
+
     uint32_t last_tick = 0;
     bool connection_pixel_state = false;
 
@@ -247,7 +247,7 @@ static void task_led(void *unused_arg) {
  * @param *unused_arg: Not used.
  */
 static void task_iot(void *unused_arg) {
-    
+
     // Configure OpenWeather
     // NOTE These values derived from env vars -- see README.md
     OW_init(LATITUDE, LONGITUDE);
@@ -282,7 +282,7 @@ static void task_iot(void *unused_arg) {
         // Was the channel closed unexpectedly?
         // `channel_was_closed` set in IRS
         if (channel_was_closed) do_close_channel = true;
-        
+
         // Use 'kill_time' to force-close an open HTTP channel
         // if it's been left open too long
         if (kill_time > 0 && tick - kill_time > CHANNEL_KILL_PERIOD_MS) {
@@ -309,7 +309,7 @@ static void task_iot(void *unused_arg) {
  * @brief Process HTTP response data.
  */
 static void process_http_response(void) {
-    
+
     // We have received data via the active HTTP channel so establish
     // an `MvHttpResponseData` record to hold response metadata
     struct MvHttpResponseData resp_data;
@@ -458,11 +458,11 @@ static void process_http_response(void) {
  * @brief Show basic device info.
  */
 static void log_device_info(void) {
-    
+
     uint8_t buffer[35] = { 0 };
     mvGetDeviceId(buffer, 34);
     server_log("Device: %s", buffer);
-    server_log("   App: %s %s", APP_NAME, APP_VERSION);
+    server_log("   App: %s %s-%u", APP_NAME, APP_VERSION, BUILD_NUM);
 }
 
 
@@ -472,7 +472,7 @@ static void log_device_info(void) {
  * @param ms: A sleep period in ms.
  */
 void sleep_ms(uint32_t ms) {
-    
+
     uint32_t tick = HAL_GetTick();
     while (1) {
         if (HAL_GetTick() - tick > ms) break;

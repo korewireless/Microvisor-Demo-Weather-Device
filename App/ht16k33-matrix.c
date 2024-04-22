@@ -2,7 +2,7 @@
  *
  * Microvisor Weather Device Demo
  *
- * Copyright © 2023, KORE Wireless
+ * Copyright © 2024, KORE Wireless
  * Licence: MIT
  *
  */
@@ -135,7 +135,7 @@ static uint8_t display_angle = 0;
  * @brief Power on the LEDs and set the brightness.
  */
 void HT16K33_init(uint8_t angle) {
-    
+
     HT16K33_write_cmd(HT16K33_CMD_POWER_ON);        // System on
     HT16K33_write_cmd(HT16K33_CMD_DISPLAY_ON);      // Display on
     HT16K33_set_brightness(2);                      // Set brightness
@@ -155,7 +155,7 @@ void HT16K33_init(uint8_t angle) {
  * @param cmd: The single-byte command.
  */
 static void HT16K33_write_cmd(uint8_t cmd) {
-    
+
     HAL_I2C_Master_Transmit(&i2c, HT16K33_I2C_ADDR << 1, &cmd, 1, 100);
 }
 
@@ -166,7 +166,7 @@ static void HT16K33_write_cmd(uint8_t cmd) {
  * @param brightness: The display brightness (1-15).
  */
 void HT16K33_set_brightness(uint8_t brightness) {
-    
+
     // Set the LED brightness
     if (brightness > 15) brightness = 15;
     HT16K33_write_cmd(HT16K33_CMD_BRIGHTNESS | brightness);
@@ -179,7 +179,7 @@ void HT16K33_set_brightness(uint8_t brightness) {
  * This does not clear the LED -- call `HT16K33_draw()`.
  */
 void HT16K33_clear_buffer(void) {
-    
+
     memset(display_buffer, 0x00, 8);
 }
 
@@ -188,7 +188,7 @@ void HT16K33_clear_buffer(void) {
  * @brief Write the display buffer out to the LED.
  */
 void HT16K33_draw(void) {
-    
+
     // Set up the buffer holding the data to be
     // transmitted to the LED
     uint8_t tx_buffer[17] = { 0 };
@@ -216,7 +216,7 @@ void HT16K33_draw(void) {
  *  @param is_set: Whether to set the pixel (`true`) ior clear it.
  */
 void HT16K33_plot(uint8_t x, uint8_t y, bool is_set) {
-    
+
     // Set or unset the specified pixel
     if (is_set) {
         display_buffer[x] |= (1 << y);
@@ -233,7 +233,7 @@ void HT16K33_plot(uint8_t x, uint8_t y, bool is_set) {
  * @param delay_ms: The scroll delay in ms.
  */
 void HT16K33_print(const char *text, uint32_t delay_ms) {
-    
+
     // Get the length of the text: the number of columns it encompasses
     uint length = 0;
     for (size_t i = 0 ; i < strlen(text) ; ++i) {
@@ -290,7 +290,7 @@ void HT16K33_print(const char *text, uint32_t delay_ms) {
  *  @param code: The character code (0-32) of the user-defined character.
  */
 void HT16K33_draw_def_char(uint8_t code) {
-    
+
     do_assert(code < 32, "HT16K33_draw_def_char() Invalid char code");
     memcpy(display_buffer, def_chars[code], 8);
 }
@@ -303,14 +303,14 @@ void HT16K33_draw_def_char(uint8_t code) {
  *  @param code:   The character code (0-32) of the user-defined character.
  */
 void HT16K33_define_character(const char* sprite, uint8_t code) {
-    
+
     do_assert(code < 32, "HT16K33_define_character() Invalid char code");
     memcpy(def_chars[code], sprite, 8);
 }
 
 
 static void HT16K33_rotate(uint8_t angle) {
-    
+
     uint8_t temp[8] = { 0 };
     uint8_t a = 0;
     uint8_t line_value = 0;

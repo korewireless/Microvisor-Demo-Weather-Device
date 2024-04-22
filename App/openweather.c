@@ -2,7 +2,7 @@
  *
  * Microvisor Weather Device Demo
  *
- * Copyright © 2023, KORE Wireless
+ * Copyright © 2024, KORE Wireless
  * Licence: MIT
  *
  */
@@ -28,10 +28,10 @@ static bool got_key = false;
  *
  */
 void OW_init(double lat, double lng) {
-    
+
     // Request the 'secret' API key
     if (!got_key) got_key = config_get_secret(api_key, API_KEY_SECRET_NAME);
-    
+
     if (got_key) sprintf(request_url,
                          "%s?lat=%.6f&lon=%.6f&appid=%s&exclude=minutely,hourly,daily,alerts&units=metric",
                          FORECAST_BASE_URL,
@@ -47,7 +47,7 @@ void OW_init(double lat, double lng) {
  * @returns Whether the request was issued (`true`) or not (`false`)
  */
 bool OW_request_forecast(void) {
-    
+
     if (!got_key) got_key = OW_get_key();
     if (got_key)  return (http_send_request(request_url) == MV_STATUS_OKAY);
     return false;
@@ -60,6 +60,6 @@ bool OW_request_forecast(void) {
  * @returns Whether the key was received (`true`) or not (`false`)
  */
 static bool OW_get_key(void) {
-    
+
     return config_get_secret(api_key, API_KEY_SECRET_NAME);
 }

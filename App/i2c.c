@@ -2,7 +2,7 @@
  *
  * Microvisor Weather Device Demo
  *
- * Copyright © 2023, KORE Wireless
+ * Copyright © 2024, KORE Wireless
  * Licence: MIT
  *
  */
@@ -25,7 +25,7 @@ extern      bool                use_i2c;
  * @brief Initialize STM32U585 I2C1.
  */
 void I2C_init(void) {
-    
+
     // I2C1 pins are:
     //   SDA -> PB9
     //   SCL -> PB6
@@ -58,7 +58,7 @@ void I2C_init(void) {
  * @returns `true` if the device is present, otherwise `false`.
  */
 static bool I2C_check(uint8_t addr) {
-    
+
     uint8_t timeout_count = 0;
 
     while(true) {
@@ -90,7 +90,7 @@ static bool I2C_check(uint8_t addr) {
  * @brief Scan for and list I2C devices on the bus.
  */
 void I2C_scan(void) {
-    
+
     uint8_t data = 0;
     for (uint8_t i = 2 ; i < 256 ; i += 2) {
         if (HAL_I2C_Master_Receive(&i2c, i , &data, 1, 10) == HAL_OK) {
@@ -106,7 +106,7 @@ void I2C_scan(void) {
  * @param i2c: A HAL I2C_HandleTypeDef pointer to the I2C instance.
  */
 void HAL_I2C_MspInit(I2C_HandleTypeDef *i2c) {
-    
+
     // This SDK-named function is called by HAL_I2C_Init()
 
     // Configure U5 peripheral clock

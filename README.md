@@ -217,7 +217,7 @@ twilio microvisor:deploy . --devicesid ${MV_DEVICE_SID} \
 
 ## Copyright and Licensing
 
-The sample code and Microvisor SDK is © 2023, KORE Wireless. It is licensed under the terms of the [MIT License](./LICENSE.md).
+The sample code and Microvisor SDK is © 2024, KORE Wireless. It is licensed under the terms of the [MIT License](./LICENSE.md).
 
 The SDK makes use of code © 2021, STMicroelectronics and affiliates. This code is licensed under terms described in [this file](https://github.com/twilio/twilio-microvisor-hal-stm32u5/blob/main/LICENSE-STM32CubeU5.md).
 

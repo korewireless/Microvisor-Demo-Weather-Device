@@ -2,7 +2,7 @@
  *
  * Microvisor Weather Device Demo
  *
- * Copyright © 2023, KORE Wireless
+ * Copyright © 2024, KORE Wireless
  * Licence: MIT
  *
  */

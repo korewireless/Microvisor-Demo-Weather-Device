@@ -2,7 +2,7 @@
  *
  * Microvisor Weather Device Demo
  *
- * Copyright © 2023, KORE Wireless
+ * Copyright © 2024, KORE Wireless
  * Licence: MIT
  *
  */
@@ -35,7 +35,7 @@ extern volatile bool channel_was_closed;
  * @returns The shared Notification Center's handle.
  */
 MvNotificationHandle shared_get_handle(void) {
-    
+
     return notification_handle;
 }
 
@@ -46,7 +46,7 @@ MvNotificationHandle shared_get_handle(void) {
  * @returns `true` of the center was established, otherwise `false`.
  */
 bool shared_setup_notification_center(void) {
-    
+
     // Clear the notification store
     memset((void *)shared_notification_center, 0xFF, sizeof(shared_notification_center));
 
@@ -82,7 +82,7 @@ bool shared_setup_notification_center(void) {
  * HTTP requests, so we use tags to determine the source channel.
  */
 void TIM8_BRK_IRQHandler(void) {
-    
+
     // Check for readable data in the HTTP channel
     bool got_notification = false;
     volatile struct MvNotification notification = shared_notification_center[notification_index];
@@ -96,7 +96,7 @@ void TIM8_BRK_IRQHandler(void) {
                 received_config = true;
                 got_notification = true;
             }
-            
+
             break;
         // HTTP channel notifications
         case TAG_CHANNEL_HTTP:
@@ -104,18 +104,18 @@ void TIM8_BRK_IRQHandler(void) {
                 received_request = true;
                 got_notification = true;
             }
-            
+
             if (notification.event_type == MV_EVENTTYPE_CHANNELNOTCONNECTED) {
                 channel_was_closed = true;
                 got_notification = true;
             }
-            
+
             break;
         // Others
         default:
             break;
     }
-    
+
     // We had a relevant notification
     if (got_notification) {
         // Point to the next record to be written

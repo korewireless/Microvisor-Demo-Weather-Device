@@ -2,7 +2,7 @@
  *
  * Microvisor Weather Device Demo
  *
- * Copyright © 2023, KORE Wireless
+ * Copyright © 2024, KORE Wireless
  * Licence: MIT
  *
  */
@@ -34,7 +34,7 @@ extern          char        forecast[32];
  * @returns `true` if the channel is open, otherwise `false`.
  */
 bool http_open_channel(void) {
-    
+
     // Set up the HTTP channel's multi-use send and receive buffers
     static volatile uint8_t http_rx_buffer[HTTP_RX_BUFFER_SIZE_B] __attribute__((aligned(512)));
     static volatile uint8_t http_tx_buffer[HTTP_TX_BUFFER_SIZE_B] __attribute__((aligned(512)));
@@ -50,7 +50,7 @@ bool http_open_channel(void) {
     // Set up shared notification center
     http_handles.notification = shared_get_handle();
     if (http_handles.notification == 0) return false;
-    
+
     // Configure the required data channel
     struct MvOpenChannelParams channel_config = {
         .version = 1,
@@ -77,7 +77,7 @@ bool http_open_channel(void) {
         server_log("HTTP channel handle: %lu", (uint32_t)http_handles.channel);
         return true;
     }
-    
+
     server_error("Could not open HTTP channel. Status: %i", status);
     return false;
 }
@@ -87,7 +87,7 @@ bool http_open_channel(void) {
  * @brief Close the currently open HTTP channel.
  */
 void http_close_channel(void) {
-    
+
     // If we have a valid channel handle -- ie. it is non-zero --
     // then ask Microvisor to close it and confirm acceptance of
     // the closure request.
@@ -111,7 +111,7 @@ void http_close_channel(void) {
  * @returns `true` if the request was accepted by Microvisor, otherwise `false`
  */
 enum MvStatus http_send_request(const char* url) {
-    
+
     // Check for a valid channel handle
     if (http_handles.channel == 0) {
         // There's no open channel, so open open one now and
@@ -119,7 +119,7 @@ enum MvStatus http_send_request(const char* url) {
         http_open_channel();
         return http_send_request(url);
     }
-    
+
     server_log("Sending HTTP request");
 
     // Set up the request
@@ -153,7 +153,7 @@ enum MvStatus http_send_request(const char* url) {
     } else {
         server_error("Could not issue request. Status: %i", status);
     }
-    
+
     return status;
 }
 

@@ -13,7 +13,7 @@
 /*
  * CONSTANTS
  */
-#define     FORECAST_BASE_URL           "https://api.openweathermap.org/data/2.5/onecall"
+#define     FORECAST_BASE_URL           "https://api.openweathermap.org/data/3.0/onecall"
 #define     API_KEY_SECRET_NAME         "secret-ow-api-key"
 
 // OpenWeather condition codes

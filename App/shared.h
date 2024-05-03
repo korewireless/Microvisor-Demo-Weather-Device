@@ -13,8 +13,10 @@
 /*
  * CONSTANTS
  */
-#define                 SHARED_NC_BUFFER_SIZE_R                     16
-
+#define             SHARED_NC_BUFFER_SIZE_R                     16
+#define             TAG_CHANNEL_HTTP                            1
+#define             TAG_CHANNEL_CONFIG                          2
+#define             TAG_CHANNEL_SYSTEM                          3
 
 #ifdef __cplusplus
 extern "C" {

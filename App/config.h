@@ -13,7 +13,6 @@
 /*
  * CONSTANTS
  */
-#define     TAG_CHANNEL_CONFIG              2
 #define     CONFIG_RX_BUFFER_SIZE_B         2560
 #define     CONFIG_TX_BUFFER_SIZE_B         512
 #define     CONFIG_WAIT_PERIOD_MS           5000

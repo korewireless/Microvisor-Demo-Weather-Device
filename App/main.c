@@ -172,7 +172,7 @@ static void GPIO_init(void) {
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
     // Configure GPIO pin output Level
-    HAL_GPIO_WritePin(LED_GPIO_BANK, LED_GPIO_PIN, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_GPIO_BANK, LED_GPIO_PIN, GPIO_PIN_RESET);
 
     // Configure GPIO pin PA5
     GPIO_InitTypeDef GPIO_InitStruct = { 0 };

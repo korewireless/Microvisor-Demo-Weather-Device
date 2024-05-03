@@ -15,7 +15,8 @@
 // The shared Notification Center's handle.
 // This is zero when the NC is not yet established.
 // See `https://www.twilio.com/docs/iot/microvisor/syscalls#http_handles`
-static MvNotificationHandle notification_handle = 0;
+static MvNotificationHandle shared_notification_handle = 0;
+static MvSystemEventHandle  system_handle;
 
 // Central store for notification records.
 // Holds SHARED_NC_BUFFER_SIZE_R records at a time -- each record is 16 bytes in size.
@@ -26,6 +27,8 @@ static volatile uint32_t notification_index = 0;
 extern volatile bool received_request;
 extern volatile bool received_config;
 extern volatile bool channel_was_closed;
+// Declared in `main.c`
+extern volatile bool polite_deploy;
 
 
 
@@ -36,7 +39,7 @@ extern volatile bool channel_was_closed;
  */
 MvNotificationHandle shared_get_handle(void) {
 
-    return notification_handle;
+    return shared_notification_handle;
 }
 
 
@@ -59,16 +62,27 @@ bool shared_setup_notification_center(void) {
 
     // Ask Microvisor to establish the notification center
     // and confirm that it has accepted the request
-    enum MvStatus status = mvSetupNotifications(&shared_notification_setup, &notification_handle);
+    enum MvStatus status = mvSetupNotifications(&shared_notification_setup, &shared_notification_handle);
     if (status != MV_STATUS_OKAY) {
         server_error("Could not set up shared NC");
         return false;
     }
 
+
+    // Tell Microvisor to use the new notification center for system notifications
+    const struct MvOpenSystemNotificationParams sys_notification_params = {
+        .notification_handle = shared_notification_handle,
+        .notification_tag = TAG_CHANNEL_SYSTEM,
+        .notification_source = MV_SYSTEMNOTIFICATIONSOURCE_UPDATE
+    };
+
+    status = mvOpenSystemNotification(&sys_notification_params, &system_handle);
+    do_assert(status == MV_STATUS_OKAY, "Could not enable system notifications");
+
     // Start the notification IRQ
     NVIC_ClearPendingIRQ(TIM8_BRK_IRQn);
     NVIC_EnableIRQ(TIM8_BRK_IRQn);
-    server_log("Shared NC handle: %lu", (uint32_t)notification_handle);
+    server_log("Shared NC handle: %lu", (uint32_t)shared_notification_handle);
     return true;
 }
 
@@ -107,6 +121,16 @@ void TIM8_BRK_IRQHandler(void) {
 
             if (notification.event_type == MV_EVENTTYPE_CHANNELNOTCONNECTED) {
                 channel_was_closed = true;
+                got_notification = true;
+            }
+
+            break;
+        case TAG_CHANNEL_SYSTEM:
+            if (notification.event_type == MV_EVENTTYPE_UPDATEDOWNLOADED) {
+                // Flag we need to access received data and to close the HTTP channel
+                // when we're back in the main loop. This lets us exit the ISR quickly.
+                // We should not make Microvisor System Calls in the ISR.
+                polite_deploy = true;
                 got_notification = true;
             }
 

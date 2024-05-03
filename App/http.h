@@ -13,7 +13,6 @@
 /*
  * CONSTANTS
  */
-#define         TAG_CHANNEL_HTTP                1
 #define         HTTP_RX_BUFFER_SIZE_B           2560
 #define         HTTP_TX_BUFFER_SIZE_B           512
 #define         HTTP_NC_BUFFER_SIZE_R           8       // NOTE Size in records, not bytes

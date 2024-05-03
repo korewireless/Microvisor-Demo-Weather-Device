@@ -128,6 +128,7 @@ static uint8_t def_chars[32][8];
 // Display buffer
 static uint8_t display_buffer[8];
 static uint8_t display_angle = 0;
+static bool    is_inverted = false;
 
 
 
@@ -174,6 +175,18 @@ void HT16K33_set_brightness(uint8_t brightness) {
 
 
 /**
+ * @brief Invert the display.
+ *
+ * @param brightness: The display brightness (1-15).
+ */
+void HT16K33_invert(void) {
+
+    // Set the LED to either light-on-dark or dark-on-light
+    is_inverted = !is_inverted;
+    HT16K33_draw();
+}
+
+/**
  * @brief Clear the display buffer.
  *
  * This does not clear the LED -- call `HT16K33_draw()`.
@@ -200,6 +213,7 @@ void HT16K33_draw(void) {
     // across the 16 bytes of the LED's buffer
     for (uint8_t i = 0 ; i < 8 ; ++i) {
         uint8_t a = display_buffer[i];
+        if (is_inverted) a = ~a;
         tx_buffer[i * 2 + 1] = (a >> 1) + ((a << 7) & 0xFF);
     }
 
@@ -309,6 +323,12 @@ void HT16K33_define_character(const char* sprite, uint8_t code) {
 }
 
 
+/**
+ *  @brief Rotate the display in 90-degree intervals.
+ *
+ *  @param angle: A value relative to the desired angle of rotation:
+ *                0 = 0/360, 1 = 90, 2 = 180, 3 = 270
+ */
 static void HT16K33_rotate(uint8_t angle) {
 
     uint8_t temp[8] = { 0 };

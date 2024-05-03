@@ -23,13 +23,16 @@ static void net_setup_notification_center(void);
 static struct {
     MvNotificationHandle notification;
     MvNetworkHandle      network;
-} net_handles = { 0, 0 };
+    MvSystemEventHandle  system;
+} net_handles = { 0 };
 
 // Central store for network management notification records.
 // Holds 'NET_NC_BUFFER_SIZE_R' records at a time -- each record is 16 bytes in size.
-static volatile struct MvNotification net_notification_buffer[NET_NC_BUFFER_SIZE_R] __attribute__((aligned(8)));
-static volatile uint32_t current_notification_idx = 0;
+static volatile struct      MvNotification net_notification_buffer[NET_NC_BUFFER_SIZE_R] __attribute__((aligned(8)));
+static volatile uint32_t    current_notification_index = 0;
 
+// Declared in `main.c`
+extern volatile bool        polite_deploy;
 
 /**
  * @brief Configure and connect to the network.
@@ -100,6 +103,16 @@ static void net_setup_notification_center(void) {
         NVIC_ClearPendingIRQ(TIM1_BRK_IRQn);
         NVIC_EnableIRQ(TIM1_BRK_IRQn);
         server_log("Network NC handle: %lu", (uint32_t)net_handles.notification);
+
+        // Tell Microvisor to use the new notification center for system notifications
+        const struct MvOpenSystemNotificationParams sys_notification_params = {
+            .notification_handle = net_handles.notification,
+            .notification_tag = 0,
+            .notification_source = MV_SYSTEMNOTIFICATIONSOURCE_UPDATE
+        };
+
+        status = mvOpenSystemNotification(&sys_notification_params, &net_handles.system);
+        do_assert(status == MV_STATUS_OKAY, "Could not enable system notifications");
     }
 }
 
@@ -122,6 +135,26 @@ void TIM1_BRK_IRQHandler(void) {
 
     // Network notifications interrupt service handler
     // Add your own notification processing code here
+
+    // Check for a suitable event: readable data in the channel
+    bool got_notification = false;
+    volatile struct MvNotification notification = net_notification_buffer[current_notification_index];
+    if (notification.event_type == MV_EVENTTYPE_UPDATEDOWNLOADED) {
+        // Flag we need to access received data and to close the HTTP channel
+        // when we're back in the main loop. This lets us exit the ISR quickly.
+        // We should not make Microvisor System Calls in the ISR.
+        polite_deploy = true;
+        got_notification = true;
+    }
+
+    if (got_notification) {
+        // Point to the next record to be written
+        current_notification_index = (current_notification_index + 1) % NET_NC_BUFFER_SIZE_R;
+
+        // Clear the current notifications event
+        // See https://www.twilio.com/docs/iot/microvisor/microvisor-notifications#buffer-overruns
+        notification.event_type = 0;
+    }
 }
 
 

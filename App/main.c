@@ -19,6 +19,7 @@ static void task_led(void *unused_arg);
 static void task_iot(void *unused_arg);
 static void process_http_response(void);
 static void log_device_info(void);
+static void do_polite_deploy(void* arg);
 
 
 /*
@@ -56,9 +57,11 @@ volatile uint8_t        icon_code = 12;
 volatile bool           new_forecast = false;
 volatile bool           received_request = false;
 volatile bool           channel_was_closed = false;
+volatile bool           polite_deploy = false;
 
 static volatile bool    is_connected = false;
 static volatile bool    net_changed = false;
+static bool             flash_led = false;
 
 /**
  * These variables are defined in `http.c`
@@ -169,7 +172,7 @@ static void GPIO_init(void) {
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
     // Configure GPIO pin output Level
-    HAL_GPIO_WritePin(LED_GPIO_BANK, LED_GPIO_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LED_GPIO_BANK, LED_GPIO_PIN, GPIO_PIN_SET);
 
     // Configure GPIO pin PA5
     GPIO_InitTypeDef GPIO_InitStruct = { 0 };
@@ -189,6 +192,7 @@ static void GPIO_init(void) {
 static void task_led(void *unused_arg) {
 
     uint32_t last_tick = 0;
+    osTimerId_t polite_timer;
     bool connection_pixel_state = false;
 
     // The task's main loop
@@ -208,7 +212,10 @@ static void task_led(void *unused_arg) {
         uint32_t tick = HAL_GetTick();
         if (tick - last_tick > DEFAULT_TASK_PAUSE_MS) {
             last_tick = tick;
-            HAL_GPIO_TogglePin(LED_GPIO_BANK, LED_GPIO_PIN);
+
+            if (flash_led) {
+                HAL_GPIO_TogglePin(LED_GPIO_BANK, LED_GPIO_PIN);
+            }
 
             if (use_i2c) {
                 if (new_forecast) {
@@ -235,6 +242,25 @@ static void task_led(void *unused_arg) {
             }
         }
 
+        // FROM 3.3.0
+        // Check if the polite deployment flag has been set
+        // via a Microvisor system notification
+        if (polite_deploy) {
+            server_log("Polite deployment notification issued");
+            polite_deploy = false;
+            flash_led = true;
+
+            // Set up a 30s timer to trigger the update
+            // NOTE In a real-world application, you would apply the update
+            //      see `do_polite_deploy()` as soon as any current critical task
+            //      completes. Here we just demo the process using a HAL timer.
+            polite_timer = osTimerNew(do_polite_deploy, osTimerOnce, NULL, NULL);
+            const uint32_t timer_delay_s = 30;
+            if (polite_timer != NULL && osTimerStart(polite_timer, timer_delay_s * 1000) == osOK) {
+                server_log("Update will install in %lu seconds", timer_delay_s);
+            }
+        }
+
         // End of cycle delay
         osDelay(10);
     }
@@ -242,7 +268,7 @@ static void task_led(void *unused_arg) {
 
 
 /**
- * @brief Function implementing the Debug Task thread.
+ * @brief Function implementing the periodic weather conditions thread.
  *
  * @param *unused_arg: Not used.
  */
@@ -476,5 +502,29 @@ void sleep_ms(uint32_t ms) {
     uint32_t tick = HAL_GetTick();
     while (1) {
         if (HAL_GetTick() - tick > ms) break;
+    }
+}
+
+
+/**
+ * @brief A CMSIS/FreeRTOS timer callback function.
+ *
+ * This is called when the polite deployment timer (see `task_led()`) fires.
+ * It tells Microvisor to apply the application update that has previously
+ * been signalled as ready to be deployed.
+ *
+ * `mvRestart()` should cause the application to be torn down and restarted,
+ * but it's important to check the returned value in case Microvisor was not
+ * able to perform the restart for some reason.
+ *
+ * @param arg: Pointer to and argument value passed by the timer controller.
+ *             Unused here.
+ */
+static void do_polite_deploy(void* arg) {
+
+    enum MvStatus status = mvRestart(MV_RESTARTMODE_AUTOAPPLYUPDATE);
+    if (status != MV_STATUS_OKAY) {
+        server_error("Could not apply update (%lu)", (uint32_t)status);
+        flash_led = false;
     }
 }

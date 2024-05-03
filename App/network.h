@@ -9,6 +9,11 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
+/*
+ * CONSTANTS
+ */
+#define     NET_NC_BUFFER_SIZE_R                8
+
 
 #ifdef __cplusplus
 extern "C" {

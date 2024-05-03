@@ -29,6 +29,7 @@ extern "C" {
  */
 void        HT16K33_init(uint8_t angle);
 void        HT16K33_draw(void);
+void        HT16K33_invert(void);
 void        HT16K33_clear_buffer(void);
 void        HT16K33_set_brightness(uint8_t brightness);
 void        HT16K33_plot(uint8_t x, uint8_t y, bool is_set);

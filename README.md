@@ -37,7 +37,9 @@ We recommend following this by deleting your `build` directory.
 
 You will need a Twilio account. [Sign up now if you don’t have one](https://www.twilio.com/try-twilio).
 
-The demo makes use of the [OpenWeather API](https://openweathermap.org/api/one-call-api). To make use of this API, you will need to [set up an OpenWeather account](https://home.openweathermap.org/users/sign_up) and obtain an API key.
+The demo makes use of the [OpenWeather OneCall API](https://openweathermap.org/api/one-call-api). To make use of this API, you will need to [set up an OpenWeather account](https://home.openweathermap.org/users/sign_up) and obtain an API key.
+
+We now use OneCall 3.0. While this is free for fewer than 1000 calls per day, you will be required to provide payment details to access the API.
 
 Get your location — or any location co-ordinates — from [Google Maps](https://www.google.co.uk/maps).
 

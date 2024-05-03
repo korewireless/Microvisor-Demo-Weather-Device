@@ -72,7 +72,7 @@ jobs:
     - name: Get Docker
       run: brew install docker colima
     - name: Run Docker
-      run: colima start
+      run: colima start -f
     - name: Build docker image
       run: docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t mv-weather-image-mac-dock .
     - name: Build code

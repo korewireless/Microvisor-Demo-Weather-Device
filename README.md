@@ -1,5 +1,7 @@
 # Microvisor Weather Device Demo
 
+[![.github/workflows/build.yml](https://github.com/korewireless/Microvisor-Demo-Weather-Device/actions/workflows/build.yml/badge.svg)](https://github.com/korewireless/Microvisor-Demo-Weather-Device/actions/workflows/build.yml)
+
 This repo provides a basic demonstration of a sample weather monitor application. It makes use of an 8x8 matrix display to periodically present the local weather conditions, which are retrieved from the [OpenWeather API](https://openweathermap.org/api/one-call-api). The OpenWeather data is parsed using [cJSON](https://github.com/DaveGamble/cJSON).
 
 The application is based on the [FreeRTOS](https://freertos.org/) real-time operating system and which will run on the “non-secure” side of Microvisor. FreeRTOS is included as a submodule.

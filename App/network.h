@@ -12,8 +12,6 @@
 /*
  * CONSTANTS
  */
-#define         TAG_CHANNEL_HTTP                1
-#define         TAG_CHANNEL_SYS                 4
 #define     NET_NC_BUFFER_SIZE_R                8
 
 

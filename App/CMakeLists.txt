@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 # Set application data
 set(APP "Microvisor Weather Demo")
-set(VERSION_NUMBER "3.2.5")
+set(VERSION_NUMBER "3.3.0")
 set(BUILD_NUMBER "1")
 
 message("Building ${APP} ${VERSION_NUMBER}")
